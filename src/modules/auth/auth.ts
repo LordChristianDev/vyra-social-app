@@ -24,19 +24,25 @@ export const QUERIES = {
 
 export const MUTATIONS = {
 	createUser: async function (uid: string) {
-		const user = {
-			google_uid: uid,
-			last_login: new Date().toISOString()
-		}
-		const result = await db.collection("users").insertOne(user);
-		return result;
+		return queryDB(async (db) => {
+			const user = {
+				google_uid: uid,
+				last_login: new Date().toISOString()
+			}
+			const result = await db.collection("users").insertOne(user);
+			return result;
+		});
 	},
 	deleteUserWithId: async function (id: number) {
-		const result = await db.collection("users").insertOne({ id: id });
-		return result;
+		return queryDB(async (db) => {
+			const result = await db.collection("users").deleteOne({ id: id });
+			return result;
+		});
 	},
 	deleteUserGoogleUid: async function (uid: string) {
-		const result = await db.collection("users").insertOne({ google_uid: uid });
-		return result;
+		return queryDB(async (db) => {
+			const result = await db.collection("users").deleteOne({ google_uid: uid });
+			return result;
+		});
 	},
-}
+};
