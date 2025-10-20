@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePersistedState } from "@/hooks/use-persisted-state";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -11,6 +11,7 @@ import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import { SuggestedProfiles } from "@/features/dashboard/components/additional/suggested-profiles";
 
+
 type ProfileOverviewProp = {
 	profile: ProfileProp;
 	posts: PostProp[];
@@ -18,7 +19,7 @@ type ProfileOverviewProp = {
 }
 
 export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOverviewProp) => {
-	const [activeTab, setActiveTab] = useState("posts");
+	const [profileActiveTab, setProfileActiveTab] = usePersistedState("profileActiveTab", "posts");
 
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -33,7 +34,7 @@ export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOvervie
 				/>
 
 				{/* Content Tabs */}
-				<Tabs value={activeTab} onValueChange={setActiveTab}>
+				<Tabs value={profileActiveTab} onValueChange={setProfileActiveTab}>
 					<TabsList className="mb-6 grid w-full grid-cols-3">
 						<TabsTrigger value="posts" className="cursor-pointer">Posts</TabsTrigger>
 						<TabsTrigger value="media" className="cursor-pointer">Media</TabsTrigger>

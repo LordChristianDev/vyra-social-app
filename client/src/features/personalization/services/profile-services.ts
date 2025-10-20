@@ -56,7 +56,7 @@ const mockProfiles: ProfileProp[] = [
 			id: 1,
 			user_id: 1,
 
-			notify_likes: false,
+			notify_likes: true,
 			notify_comments: false,
 			notify_follows: false,
 			notify_messages: false,
