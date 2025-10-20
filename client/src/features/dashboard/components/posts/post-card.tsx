@@ -53,8 +53,6 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 	const handleShares = () => setIsShared(!isShared);
 	const handleSaves = () => setIsSaved(!isSaved);
 
-	console.log(youtube_embed);
-
 	return (
 		<Card className="mb-6 shadow-soft border-border/50">
 			<CardHeader className="pb-3">
