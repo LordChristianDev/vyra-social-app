@@ -29,3 +29,10 @@ export type ProfileProp = {
 	notif_settings: NotificationSettingsProp;
 	privacy_settings: PrivacySettingsProp;
 };
+
+export type MediaProp = {
+	id: string;
+	file: File;
+	url: string;
+	type: string;
+};
