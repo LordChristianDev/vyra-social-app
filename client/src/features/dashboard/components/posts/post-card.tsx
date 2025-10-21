@@ -35,7 +35,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 	const [isDeletePostDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
 	const {
-		author_id, created_at, content, images, youtube_embed, comments, all_likes, all_saved, all_shares,
+		author_id, created_at, content, images, youtube_embed, tags, comments, all_likes, all_saved, all_shares,
 		author: { first_name, last_name, username, avatar_url, privacy_settings: { is_verified } }
 	} = post;
 
@@ -52,6 +52,12 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 	const handleLikes = () => setIsLiked(!isLiked);
 	const handleShares = () => setIsShared(!isShared);
 	const handleSaves = () => setIsSaved(!isSaved);
+
+	const renderTags = (tags ?? []).map(tags => (
+		<Badge key={tags.id} className="space-x-4 px-1.5 py-0.5 text-xs text-white bg-gradient-primary">
+			{tags.title}
+		</Badge>
+	))
 
 	return (
 		<Card className="mb-6 shadow-soft border-border/50">
@@ -120,6 +126,12 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 							className="w-full h-full"
 							allowFullScreen
 						/>
+					</div>
+				)}
+
+				{tags && tags.length > 0 && (
+					<div className="flex justify-end space-x-2 ">
+						{renderTags}
 					</div>
 				)}
 			</CardContent>

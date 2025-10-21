@@ -51,7 +51,7 @@ export const SuggestedProfiles = () => {
 	return (
 		profilesFetching ? (
 			<div className="animate-pulse space-y-4">
-				<div className="h-73 w-full bg-muted rounded" />
+				<div className="h-72 w-full bg-muted rounded" />
 			</div>
 		) : (
 			<Card className="shadow-soft border-border/50">
