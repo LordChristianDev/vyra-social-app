@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useProfile } from "@/context/use-profile";
 
-import { DashboardOverview } from "@/features/dashboard/components/dashboard/dashboard-overview";
+import { HomeOverview } from "@/features/dashboard/components/home/home-overview";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
@@ -63,7 +63,7 @@ const HomeContent = () => {
 					</div>
 				</div>
 			) : (
-				<DashboardOverview
+				<HomeOverview
 					profile={profileData as ProfileProp}
 					posts={postsData as PostProp[]}
 				/>
