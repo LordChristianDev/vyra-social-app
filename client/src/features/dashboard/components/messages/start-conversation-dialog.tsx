@@ -1,0 +1,163 @@
+import { useEffect, useEffectEvent, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Search } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { showToast } from "@/lib/show-toast";
+import { createFullName, getInitials } from "@/lib/formatters";
+
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { AvatarIcon } from "@/components/common/avatar-icon";
+import { LoadingHud } from "@/components/common/loading-hud";
+
+import type { ProfileProp } from "@/features/personalization/types/profile-types";
+import { QUERIES } from "@/features/personalization/services/profile-services";
+import { useProfile } from "@/context/use-profile";
+
+type StartConversationDialogProp = {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+};
+
+export const StartConversationDialog = ({
+	open,
+	onOpenChange,
+}: StartConversationDialogProp) => {
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const [search, setSearch] = useState<string>("")
+	const [profiles, setProfiles] = useState<ProfileProp[]>([]);
+
+	const { filterProfiles } = useProfile();
+
+	const { data: profilesData, isFetching: profilesFetching } = useQuery({
+		queryKey: ["suggested-convo-profiles"],
+		queryFn: () => QUERIES.fetchSuggestedProfiles(1),
+		refetchOnMount: true,
+		enabled: open,
+		staleTime: 0,
+	});
+
+	const onUpdated = useEffectEvent(() => {
+		if (profilesData && !profilesFetching) {
+			setProfiles(profilesData);
+		}
+	});
+
+	useEffect(() => {
+		onUpdated();
+	}, [profilesData, profilesFetching]);
+
+	useEffect(() => {
+		setProfiles([]);
+	}, [open]);
+
+	useEffect(() => {
+		if (search.trim() == "") {
+			if (profilesData) {
+				setProfiles(profilesData);
+			}
+		} else {
+			if (profilesData) {
+				setProfiles(filterProfiles(profilesData, search));
+			}
+		}
+	}, [profilesData, search]);
+
+	const renderProfiles = profiles.map((profile) => {
+		const { id, first_name, last_name, username, avatar_url } = profile;
+
+		const fullName = createFullName(first_name, last_name);
+
+		const handleCreateNewConvo = (profile_id: number) => {
+			if (!profile_id) throw new Error("No Unique Identifer Found");
+			setIsLoading(true);
+
+			setTimeout(() => {
+				setIsLoading(false);
+				onOpenChange(false);
+
+				showToast({
+					title: "Conversation Created",
+					description: "You have successfully created a new conversation",
+					variant: "success"
+				});
+			}, 3000);
+		}
+
+		return (
+			<div
+				key={first_name + last_name + id}
+				className={cn(
+					"mx-auto p-4 group flex flex-row items-center gap-4 rounded-xl cursor-pointer transition-smooth border-2 overflow-hidden",
+					"hover:bg-accent/30 border-transparent hover:border-accent/50"
+				)}
+				onClick={() => handleCreateNewConvo(id)}
+			>
+				<div className="relative flex-shrink-0">
+					<AvatarIcon
+						src={avatar_url ?? ''}
+						fallback={getInitials(fullName)}
+						className="ring-2 ring-primary/20 group-hover:ring-primary/40 transition-smooth"
+					/>
+				</div>
+
+				<div className="flex-1 min-w-0 overflow-hidden">
+					<div className="flex items-center justify-between gap-2 w-full">
+						<p className="font-base text-foreground group-hover:text-primary transition-smooth flex-1 min-w-0 truncate">
+							{fullName}
+						</p>
+					</div>
+					<p className="text-sm text-muted-foreground flex-1 min-w-0 truncate">
+						@{username}
+					</p>
+				</div>
+			</div >
+		);
+	});
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="max-w-lg max-h-[90vh]">
+				<DialogHeader>
+					<DialogTitle>Start Chat</DialogTitle>
+
+					<DialogDescription>
+						Talk to someone new
+					</DialogDescription>
+				</DialogHeader>
+				{profilesFetching ? (
+					<div className="animate-pulse space-y-4">
+						<div className="h-12 w-full bg-muted rounded" />
+						<div className="h-16 w-full bg-muted rounded" />
+						<div className="h-16 w-full bg-muted rounded" />
+						<div className="h-16 w-full bg-muted rounded" />
+					</div>
+				) : (
+					<div className="space-y-4">
+						<div className="mb-4 relative group">
+							<Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-smooth" />
+							<Input
+								placeholder="Search names..."
+								defaultValue={search}
+								onChange={(e) => setSearch(e.target.value)}
+								className="pl-12 bg-background/80 border-2 border-muted h-12  focus:border-primary rounded-xl shadow-sm transition-smooth"
+							/>
+						</div>
+						<div className="space-y-2">
+							{renderProfiles}
+						</div>
+					</div>
+				)}
+				<LoadingHud isOpen={isLoading} message="Please wait..." />
+			</DialogContent >
+		</Dialog >
+	);
+};
