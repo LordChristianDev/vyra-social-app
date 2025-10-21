@@ -12,6 +12,7 @@ export type ConversationProp = {
 export type ParticipantProp = {
 	id: number;
 	profile_id: number;
+	conversation_id: number;
 	added_at: string;
 
 	profile: ProfileProp;
@@ -19,6 +20,7 @@ export type ParticipantProp = {
 
 export type MessageProp = {
 	id: number;
+	conversation_id: number
 	sender_id: number;
 	receiver_id: number;
 	sent_at: string;
