@@ -17,7 +17,24 @@ export const useProfileHook = () => {
 
 	const clearProfile = () => setProfile({} as ProfileProp);
 
-	return { profile, storeProfile, clearProfile };
+	const filterProfiles = (profiles: ProfileProp[], query: string): ProfileProp[] => {
+		if (profiles.length === 0) return [];
+		if (!query.trim()) return profiles;
+
+		const lowerQuery = query.toLowerCase();
+
+		return profiles.filter((profile) => {
+			const { first_name, last_name, username } = profile;
+
+			const un = username.toLowerCase();
+			const fn = first_name.toLowerCase();
+			const ln = last_name.toLowerCase();
+
+			return (un.includes(lowerQuery) || fn.includes(lowerQuery) || ln.includes(lowerQuery));
+		});
+	};
+
+	return { profile, storeProfile, clearProfile, filterProfiles };
 };
 
 export const ProfileProvider = ({ children }: ProfileProviderProps) => {
@@ -43,6 +60,7 @@ type ProfileContextType = {
 	profile: ProfileProp;
 	storeProfile: (data: ProfileProp) => void;
 	clearProfile: () => void;
+	filterProfiles: (profiles: ProfileProp[], query: string) => ProfileProp[];
 };
 
 type ProfileProviderProps = {

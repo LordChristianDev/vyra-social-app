@@ -28,7 +28,7 @@ export const QUERIES = {
 	},
 };
 
-const mockProfiles: ProfileProp[] = [
+export const mockProfiles: ProfileProp[] = [
 	{
 		id: 1,
 		user_id: 1,
