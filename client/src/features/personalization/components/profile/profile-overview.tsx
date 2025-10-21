@@ -6,11 +6,10 @@ import { DisplayPosts } from "@/features/dashboard/components/posts/display-post
 import { ProfileCard } from "@/features/personalization/components/profile/profile-card";
 import { ProfileCover } from "@/features/personalization/components/profile/profile-cover";
 import { ProfileInfo } from "@/features/personalization/components/profile/profile-info";
+import { SuggestedProfiles } from "@/features/dashboard/components/additional/suggested-profiles";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { SuggestedProfiles } from "@/features/dashboard/components/additional/suggested-profiles";
-
 
 type ProfileOverviewProp = {
 	profile: ProfileProp;

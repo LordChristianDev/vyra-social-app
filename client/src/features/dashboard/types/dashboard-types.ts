@@ -21,8 +21,12 @@ export type PostProp = {
 
 export type TagProp = {
 	id: number;
+	category_id: number;
 	created_at: string;
 	title: string;
+	popularity: number;
+
+	category: CategoryProp;
 };
 
 export type CommentProp = {
@@ -33,4 +37,10 @@ export type CommentProp = {
 	all_likes: number[];
 
 	author: ProfileProp;
+};
+
+export type CategoryProp = {
+	id: number;
+	created_at: string;
+	title: string;
 };
