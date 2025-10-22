@@ -1,5 +1,8 @@
-import type { NotificationProp } from "@/features/personalization/types/notification-types";
 import { Heart, MessageCircle, Share, UserPlus } from "lucide-react";
+
+import type { NotificationProp } from "@/features/personalization/types/notification-types";
+import { mockProfiles } from "@/features/personalization/services/profile-services";
+
 
 export const QUERIES = {
 	fetchNotifications: async function (): Promise<NotificationProp[]> {
@@ -12,6 +15,45 @@ export const QUERIES = {
 export const MUTATIONS = {};
 
 export const mockNotifications: NotificationProp[] = [
+	{
+		id: 1,
+		author_id: 2,
+		created_at: "2025-10-20 16:48:11.644153+00",
+		type: "like",
+		content: "liked your post",
+		is_read: false,
+		author: mockProfiles[1],
+	},
+	{
+		id: 2,
+		author_id: 3,
+		created_at: "2025-10-20 16:48:11.644153+00",
+		type: "comment",
+		content: "commented on your post: \"Great work!\"",
+		is_read: false,
+		author: mockProfiles[2],
+	},
+	{
+		id: 3,
+		author_id: 4,
+		created_at: "2025-10-20 16:48:11.644153+00",
+		type: "follow",
+		content: "started following you",
+		is_read: false,
+		author: mockProfiles[3],
+	},
+	{
+		id: 4,
+		author_id: 5,
+		created_at: "2025-10-20 16:48:11.644153+00",
+		type: "message",
+		content: "sent you a message",
+		is_read: false,
+		author: mockProfiles[4],
+	},
+];
+
+export const fakeNotifs = [
 	{
 		id: 1,
 		type: "like",

@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Heart, MessageCircle, UserPlus } from "lucide-react";
+import { Bell } from "lucide-react";
 
 import { useRoutes } from "@/hooks/use-routes";
+import { useNotifications } from "@/features/personalization/hooks/useNotifications";
+import { getNotificationIcon } from "@/lib/helpers";
+import { createFullName, getInitials, timeAgo } from "@/lib/formatters";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,28 +17,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { NotificationProp } from "@/features/personalization/types/notification-types";
 import { QUERIES } from "@/features/personalization/services/notification-services";
 
-const getNotificationIcon = (type: string) => {
-	switch (type) {
-		case "like":
-			return <Heart className="h-4 w-4 text-red-500" />;
-		case "comment":
-			return <MessageCircle className="h-4 w-4 text-blue-500" />;
-		case "follow":
-			return <UserPlus className="h-4 w-4 text-green-500" />;
-		case "message":
-			return <MessageCircle className="h-4 w-4 text-primary" />;
-		default:
-			return <Bell className="h-4 w-4" />;
-	}
-};
-
 export const NotificationsPopover = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [notifications, setNotifications] = useState<NotificationProp[]>([]);
+
 	const { move } = useRoutes();
+	const { unread } = useNotifications();
 
 	const { data, isFetching } = useQuery({
-		queryKey: ["user-notifications"],
+		queryKey: ["appbar-notifications"],
 		queryFn: async () => QUERIES.fetchNotifications(),
 		enabled: true,
 		staleTime: 0,
@@ -51,7 +41,7 @@ export const NotificationsPopover = () => {
 		setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
 	};
 
-	const unreadCount = notifications.filter(notif => !notif.read).length;
+	const unreadCount = unread(notifications);
 
 	const handleOpenChange = (open: boolean) => {
 		setIsOpen(open);
@@ -61,18 +51,20 @@ export const NotificationsPopover = () => {
 	};
 
 	const renderNotifications = notifications.map((notification, index) => {
-		const { id, type, actor, content, time, read } = notification;
+		const { id, created_at, type, content, is_read,
+			author: { first_name, last_name, avatar_url }
+		} = notification;
 
-		const renderActor = actor.name.split(" ").map(n => n[0]).join("");
+		const fullname = createFullName(first_name, last_name)
 
 		return (
 			<div key={id}>
-				<div className={`p-3 hover:bg-accent/50 cursor-pointer transition-smooth ${!read ? 'bg-accent/20' : ''
+				<div className={`p-3 hover:bg-accent/50 cursor-pointer transition-smooth ${!is_read ? 'bg-accent/20' : ''
 					}`}>
 					<div className="flex gap-3">
 						<AvatarIcon
-							src={actor.avatar}
-							fallback={renderActor}
+							src={avatar_url ?? ""}
+							fallback={getInitials(fullname)}
 							size="sm"
 						/>
 
@@ -80,17 +72,17 @@ export const NotificationsPopover = () => {
 							<div className="flex items-center gap-2 mb-1">
 								{getNotificationIcon(type)}
 								<span className="text-sm font-medium truncate">
-									{actor.name}
+									{first_name}
 								</span>
 								<span className="text-xs text-muted-foreground">
-									{time}
+									{timeAgo(created_at)}
 								</span>
 							</div>
 							<p className="text-sm text-muted-foreground">
 								{content}
 							</p>
 						</div>
-						{!read && (
+						{!is_read && (
 							<div className="h-2 w-2 bg-primary rounded-full mt-1" />
 						)}
 					</div>

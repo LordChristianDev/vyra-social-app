@@ -1,18 +1,15 @@
-import type { LucideIcon } from "lucide-react";
+import type { ProfileProp } from "@/features/personalization/types/profile-types";
+
 
 export type NotificationProp = {
-	id: number,
-	type: string,
-	content: string,
-	time: string,
-	read: boolean,
-	icon: LucideIcon,
-	iconColor: string,
-	actor: ActorProp,
+	id: number;
+	author_id: number;
+	created_at: string;
+
+	type: "like" | "comment" | "follow" | "share" | "message";
+	content: string;
+	is_read: boolean;
+
+	author: ProfileProp;
 };
 
-export type ActorProp = {
-	name: string,
-	username: string,
-	avatar: string,
-};
