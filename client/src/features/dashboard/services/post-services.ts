@@ -1,5 +1,5 @@
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import type { PostProp, TagProp } from "@/features/dashboard/types/dashboard-types";
+import type { CategoryProp, PostProp, TagProp } from "@/features/dashboard/types/dashboard-types";
 import { QUERIES as PROFILE_QUERIES } from "@/features/personalization/services/profile-services";
 
 export const QUERIES = {
@@ -76,9 +76,45 @@ export const QUERIES = {
 
 		return tags;
 	},
+	fetchCategories: async function (): Promise<CategoryProp[]> {
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
+		let categories: CategoryProp[] = [];
+
+		categories = mockCategories.slice(0.5).sort((a, b) => a.popularity - b.popularity);
+
+		return categories;
+	},
 };
 
 export const MUTATIONS = {};
+
+const mockCategories: CategoryProp[] = [
+	{
+		id: 1,
+		created_at: "2025-09-23 18:08:11.644153+00",
+		title: "Frameworks",
+		popularity: 1240,
+	},
+	{
+		id: 2,
+		created_at: "2025-09-23 18:08:11.644153+00",
+		title: "Design",
+		popularity: 890,
+	},
+	{
+		id: 3,
+		created_at: "2025-09-23 18:08:11.644153+00",
+		title: "Technology",
+		popularity: 670,
+	},
+	{
+		id: 4,
+		created_at: "2025-09-23 18:08:11.644153+00",
+		title: "Business",
+		popularity: 540,
+	},
+];
 
 const mockPost: Partial<PostProp>[] = [
 	{
@@ -181,11 +217,7 @@ const mockPost: Partial<PostProp>[] = [
 				created_at: "2025-09-23 18:08:11.644153+00",
 				title: "UI Design",
 				popularity: 1,
-				category: {
-					id: 2,
-					created_at: "2025-09-23 18:08:11.644153+00",
-					title: "Design",
-				},
+				category: mockCategories[1],
 			},
 			{
 				id: 2,
@@ -193,11 +225,7 @@ const mockPost: Partial<PostProp>[] = [
 				created_at: "2025-09-23 18:08:11.644153+00",
 				title: "React",
 				popularity: 1,
-				category: {
-					id: 1,
-					created_at: "2025-09-23 18:08:11.644153+00",
-					title: "Frameworks",
-				},
+				category: mockCategories[0],
 			},
 		],
 		comments: [
@@ -271,11 +299,7 @@ const mockPost: Partial<PostProp>[] = [
 				created_at: "2025-09-23 18:08:11.644153+00",
 				title: "AWS",
 				popularity: 1,
-				category: {
-					id: 3,
-					created_at: "2025-09-23 18:08:11.644153+00",
-					title: "Technology",
-				},
+				category: mockCategories[2],
 			},
 		],
 		comments: [
@@ -341,32 +365,20 @@ const mockTags: Partial<TagProp>[] = [
 		category_id: 2,
 		created_at: "2025-09-23 18:08:11.644153+00",
 		title: "UI Design",
-		category: {
-			id: 2,
-			created_at: "2025-09-23 18:08:11.644153+00",
-			title: "Design",
-		},
+		category: mockCategories[1],
 	},
 	{
 		id: 2,
 		category_id: 1,
 		created_at: "2025-09-23 18:08:11.644153+00",
 		title: "React",
-		category: {
-			id: 1,
-			created_at: "2025-09-23 18:08:11.644153+00",
-			title: "Frameworks",
-		},
+		category: mockCategories[0],
 	},
 	{
 		id: 3,
 		category_id: 3,
 		created_at: "2025-09-23 18:08:11.644153+00",
 		title: "AWS",
-		category: {
-			id: 3,
-			created_at: "2025-09-23 18:08:11.644153+00",
-			title: "Technology",
-		},
+		category: mockCategories[2],
 	},
 ];
