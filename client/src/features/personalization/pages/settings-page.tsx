@@ -38,10 +38,9 @@ const SettingsContent = () => {
 	return (
 		<main className="p-8 mx-auto w-full">
 			{profileFetching ? (
-				<div className="animate-pulse space-y-4">
-					<div className="h-48 w-full bg-muted rounded" />
-					<div className="h-48 w-full bg-muted rounded" />
-					<div className="h-48 w-full bg-muted rounded" />
+				<div className="animate-pulse space-y-6">
+					<div className="h-8 w-full bg-muted rounded" />
+					<div className="h-128 w-full bg-muted rounded" />
 				</div>
 			) : (
 				<SettingsOverview

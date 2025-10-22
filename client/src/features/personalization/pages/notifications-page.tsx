@@ -23,8 +23,7 @@ const NotificationsContent = () => {
 		<main className="p-8 mx-auto w-full">
 			{notificationsFetching ? (
 				<div className="animate-pulse space-y-4">
-					<div className="h-12 w-full bg-muted rounded" />
-					<div className="h-48 w-full bg-muted rounded" />
+					<div className="h-128 w-full bg-muted rounded" />
 				</div>
 			) : (
 				<NotificationsOverview

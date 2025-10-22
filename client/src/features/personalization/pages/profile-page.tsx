@@ -49,9 +49,18 @@ const ProfileContent = () => {
 		<main className="p-8 mx-auto w-full">
 			{profileFetching || postsFetching ? (
 				<div className="animate-pulse space-y-4">
-					<div className="h-48 w-full bg-muted rounded" />
-					<div className="h-48 w-full bg-muted rounded" />
-					<div className="h-48 w-full bg-muted rounded" />
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+						<div className="lg:col-span-2 space-y-4">
+							<div className="h-56 w-full bg-muted rounded" />
+							<div className="h-48 w-full bg-muted rounded" />
+							<div className="h-12 w-full bg-muted rounded" />
+							<div className="h-48 w-full bg-muted rounded" />
+						</div>
+						<div className="lg:col-span-1 space-y-4">
+							<div className="h-72 w-full bg-muted rounded" />
+							<div className="h-72 w-full bg-muted rounded" />
+						</div>
+					</div>
 				</div>
 			) : (
 				<ProfileOverview
