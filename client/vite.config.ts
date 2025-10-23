@@ -24,24 +24,6 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env': loadEnv(mode, '../'),
     },
+    envDir: '../',
   }
 });
-
-// export default defineConfig({
-//   plugins: [
-//     react({
-//       babel: {
-//         plugins: [['babel-plugin-react-compiler']],
-//       },
-//     }),
-//     tailwindcss()
-//   ],
-//   resolve: {
-//     alias: {
-//       "@": path.resolve(__dirname, "./src"),
-//     },
-//   },
-//   define: {
-//     'process.env': loadEnv(mode, '../'),
-//   },
-// })
