@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { StackTheme } from "@stackframe/react";
 
 import { AuthProvider } from "@/context/use-auth";
 import { ThemeProvider } from "@/context/use-theme";
@@ -19,38 +20,38 @@ import ViewProfilePage from "@/features/personalization/pages/view-profile-page"
 import SettingsPage from "@/features/personalization/pages/settings-page";
 import NotFound from "@/features/authentication/pages/not-found";
 
-const App = () => {
+export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <ProfileProvider>
           <TooltipProvider>
             <Toaster />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="*" element={
-                <ProtectedRoute>
-                  <AuthenticatedLayout>
-                    <Routes>
-                      <Route path="/home" element={<HomePage />} />
-                      <Route path="/explore" element={<ExplorePage />} />
-                      <Route path="/messages" element={<MessagesPage />} />
-                      <Route path="/notifications" element={<NotificationsPage />} />
-                      <Route path="/profile" element={<ProfilePage />} />
-                      <Route path="/view-profile/:id" element={<ViewProfilePage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </AuthenticatedLayout>
-                </ProtectedRoute>
-              } />
-            </Routes>
+            <StackTheme>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="*" element={
+                  <ProtectedRoute>
+                    <AuthenticatedLayout>
+                      <Routes>
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/explore" element={<ExplorePage />} />
+                        <Route path="/messages" element={<MessagesPage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/view-profile/:id" element={<ViewProfilePage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </AuthenticatedLayout>
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </StackTheme>
           </TooltipProvider>
         </ProfileProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 };
-
-export default App;
