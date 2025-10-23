@@ -1,15 +1,5 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 
-import { getEnvVar } from "@/utils/utils";
-
-const uri = getEnvVar("MONGO_CONNECTION");
-
-export const client = new MongoClient(uri, {
-	serverApi: {
-		version: ServerApiVersion.v1,
-		strict: true,
-		deprecationErrors: true,
-	}
-});
-
-export const db = client.db("vyra");
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle({ client: sql });
