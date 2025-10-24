@@ -3,6 +3,8 @@ import cors from '@koa/cors';
 import Router from '@koa/router';
 import bodyParser from 'koa-bodyparser';
 
+import authRoutes from './modules/auth/auth-route';
+
 const app = new Koa();
 const router = new Router();
 
@@ -10,16 +12,13 @@ const router = new Router();
 app.use(cors());
 app.use(bodyParser());
 
-// Sample routes
+// Health check
 router.get('/', (ctx) => {
-  ctx.body = { message: 'Hello from Koa!' };
+  ctx.body = { message: 'API is running' };
 });
 
-router.post('/echo', (ctx) => {
-  ctx.body = {
-    received: ctx.request.body,
-  };
-});
+// Mount sub-routes
+router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods());
 
 // Register routes
 app.use(router.routes());
