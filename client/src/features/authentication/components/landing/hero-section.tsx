@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LoginDialog } from "../login/login-dialog";
-
+import { LoginDialog } from "@/features/authentication/components/login/login-dialog";
 
 export const HeroSection = () => {
 	return (

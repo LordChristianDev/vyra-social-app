@@ -3,9 +3,9 @@ import { HeroSection } from "@/features/authentication/components/landing/hero-s
 import { StatsSection } from "@/features/authentication/components/landing/stats-section";
 import { FeaturesSection } from "@/features/authentication/components/landing/features-section";
 import { CTASection } from "@/features/authentication/components/landing/cta-section";
-import { FooterSection } from "../components/landing/footer-section";
+import { FooterSection } from "@/features/authentication/components/landing/footer-section";
 
-const LandingPage = () => {
+export default function LandingPage() {
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Hero Section */}
@@ -28,6 +28,4 @@ const LandingPage = () => {
 			<FooterSection />
 		</div >
 	);
-}
-
-export default LandingPage;
+};

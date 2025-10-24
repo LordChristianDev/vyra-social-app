@@ -1,7 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { scrollToSection } from "@/lib/utils";
+
+import { Button } from "@/components/ui/button";
+import { LoginDialog } from "@/features/authentication/components/login/login-dialog";
+
 import { AppbarNavItems } from "@/services/layout-services";
-import { LoginDialog } from "../login/login-dialog";
 
 export const Navbar = () => {
 	return (
