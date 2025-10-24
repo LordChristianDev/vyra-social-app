@@ -15,6 +15,7 @@ export const mockNotifications: NotificationProp[] = [
 	{
 		id: 1,
 		author_id: 2,
+		recipient_id: 1,
 		created_at: "2025-10-20 16:48:11.644153+00",
 		type: "like",
 		content: "liked your post",
@@ -24,6 +25,7 @@ export const mockNotifications: NotificationProp[] = [
 	{
 		id: 2,
 		author_id: 3,
+		recipient_id: 1,
 		created_at: "2025-10-20 16:48:11.644153+00",
 		type: "comment",
 		content: "commented on your post: \"Great work!\"",
@@ -33,6 +35,7 @@ export const mockNotifications: NotificationProp[] = [
 	{
 		id: 3,
 		author_id: 4,
+		recipient_id: 1,
 		created_at: "2025-10-20 16:48:11.644153+00",
 		type: "follow",
 		content: "started following you",
@@ -42,6 +45,7 @@ export const mockNotifications: NotificationProp[] = [
 	{
 		id: 4,
 		author_id: 5,
+		recipient_id: 1,
 		created_at: "2025-10-20 16:48:11.644153+00",
 		type: "message",
 		content: "sent you a message",
