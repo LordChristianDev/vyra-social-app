@@ -8,6 +8,9 @@ export const usersTable = pgTable("users", {
 	last_login: timestamp().notNull().defaultNow(),
 });
 
+export type InsertUser = typeof usersTable.$inferInsert;
+export type SelectUser = typeof usersTable.$inferSelect;
+
 /** 
  * Posts Schema
  */
@@ -28,6 +31,9 @@ export const postsTable = pgTable("posts", {
 	all_shares: integer().array().notNull().default([]),
 });
 
+export type InsertPost = typeof postsTable.$inferInsert;
+export type SelectPost = typeof postsTable.$inferSelect;
+
 export const tagsTable = pgTable("tags", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	category_id: integer().notNull(),
@@ -37,6 +43,9 @@ export const tagsTable = pgTable("tags", {
 	popularity: integer().notNull().default(0),
 });
 
+export type InsertTag = typeof tagsTable.$inferInsert;
+export type SelectTag = typeof tagsTable.$inferSelect;
+
 export const categoriesTable = pgTable("categories", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	created_at: timestamp().notNull().defaultNow(),
@@ -44,6 +53,9 @@ export const categoriesTable = pgTable("categories", {
 	title: varchar({ length: 255 }).notNull(),
 	popularity: integer().notNull().default(0),
 });
+
+export type InsertCategory = typeof categoriesTable.$inferInsert;
+export type SelectCategory = typeof categoriesTable.$inferSelect;
 
 export const commentsTable = pgTable("comments", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -55,6 +67,9 @@ export const commentsTable = pgTable("comments", {
 	all_likes: integer().array().notNull().default([]),
 });
 
+export type InsertComment = typeof commentsTable.$inferInsert;
+export type SelectComment = typeof commentsTable.$inferSelect;
+
 /**
  * Messages Schema
  */
@@ -65,12 +80,18 @@ export const conversationsTable = pgTable("conversations", {
 	updated_at: timestamp().notNull().defaultNow(),
 });
 
+export type InsertConversation = typeof conversationsTable.$inferInsert;
+export type SelectConversation = typeof conversationsTable.$inferSelect;
+
 export const participantsTable = pgTable("participants", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	profile_id: integer().notNull(),
 	conversation_id: integer().notNull(),
 	added_at: timestamp().notNull().defaultNow(),
 });
+
+export type InsertParticipant = typeof participantsTable.$inferInsert;
+export type SelectParticipant = typeof participantsTable.$inferSelect;
 
 export const messagesTable = pgTable("messages", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -85,6 +106,9 @@ export const messagesTable = pgTable("messages", {
 	is_read: boolean().notNull().default(false),
 });
 
+export type InsertMessage = typeof messagesTable.$inferInsert;
+export type SelectMessage = typeof messagesTable.$inferSelect;
+
 /**
  * Notifications Schema
  */
@@ -92,12 +116,16 @@ export const messagesTable = pgTable("messages", {
 export const notificationsTable = pgTable("notifications", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	author_id: integer().notNull(),
+	recipient_id: integer().notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 
 	content: varchar({ length: 255 }).notNull(),
 	type: varchar({ length: 255 }).notNull(),
 	is_read: boolean().notNull().default(false),
 });
+
+export type InsertNotification = typeof notificationsTable.$inferInsert;
+export type SelectNotification = typeof notificationsTable.$inferSelect;
 
 /**
  * Profile Schema
@@ -128,6 +156,9 @@ export const profilesTable = pgTable("profiles", {
 	all_followers: integer().array().notNull().default([]),
 });
 
+export type InsertProfile = typeof profilesTable.$inferInsert;
+export type SelectProfile = typeof profilesTable.$inferSelect;
+
 /**
  * Settings Schema
  */
@@ -144,6 +175,9 @@ export const notificationSettingsTable = pgTable("notification_settings", {
 	notify_messages: boolean().notNull().default(false),
 });
 
+export type InsertNotificationSettings = typeof notificationSettingsTable.$inferInsert;
+export type SelectNotificationSettings = typeof notificationSettingsTable.$inferSelect;
+
 export const privacySettingsTable = pgTable("privacy_settings", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	user_id: integer().notNull(),
@@ -155,6 +189,5 @@ export const privacySettingsTable = pgTable("privacy_settings", {
 	show_active: boolean().notNull().default(false),
 });
 
-
-
-
+export type InsertPrivacySettings = typeof privacySettingsTable.$inferInsert;
+export type SelectPrivacySettings = typeof privacySettingsTable.$inferSelect;
