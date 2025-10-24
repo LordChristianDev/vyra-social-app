@@ -7,8 +7,8 @@ import {
 } from '@/db/schema';
 
 import {
-	MUTATIONS,
 	QUERIES,
+	MUTATIONS,
 } from '@/modules/profiles/server/notification-server';
 
 const router = new Router();

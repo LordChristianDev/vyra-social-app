@@ -102,10 +102,6 @@ router.get('/fetch-uid/:uid', async (ctx) => {
 	};
 });
 
-// router.put('/:id', (ctx) => {
-// 	ctx.body = { message: `Update user ${ctx.params.id}` };
-// });
-
 /**
  * Delete
  */
