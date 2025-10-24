@@ -23,13 +23,15 @@ export const QUERIES = {
 		page: number = 1,
 		pageSize: number = 5,
 	) {
-		const result = await db
-			.select()
-			.from(NOTIFICATIONS_TABLE)
-			.limit(pageSize)
-			.offset((page - 1) * pageSize);
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(NOTIFICATIONS_TABLE)
+				.limit(pageSize)
+				.offset((page - 1) * pageSize);
 
-		return result;
+			return result;
+		});
 	},
 	fetchNotificationsWithUserId: async function (user_id: SelectNotification["recipient_id"]) {
 		return queryDB(async () => {
