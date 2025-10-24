@@ -2,8 +2,10 @@ import Koa from 'koa';
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import bodyParser from 'koa-bodyparser';
+import 'dotenv/config';
 
-import authRoutes from './modules/auth/auth-route';
+import authRoutes from '@/modules/auth/routes/auth-route';
+import notificationRoutes from '@/modules/profiles/routes/notification-route';
 
 const app = new Koa();
 const router = new Router();
@@ -17,8 +19,12 @@ router.get('/', (ctx) => {
   ctx.body = { message: 'API is running' };
 });
 
-// Mount sub-routes
+// -- Mount sub-routes
+// Auth
 router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods());
+
+// Profile
+router.use('/notification', notificationRoutes.routes(), notificationRoutes.allowedMethods());
 
 // Register routes
 app.use(router.routes());
