@@ -72,39 +72,43 @@ export const MUTATIONS = {
 		user_id: SelectNotificationSettings["user_id"],
 		updates: Object,
 	) {
-		const cleanUpdates = Object.fromEntries(
-			Object.entries(updates).filter(([_, value]) => value !== undefined)
-		);
+		return queryDB(async () => {
+			const cleanUpdates = Object.fromEntries(
+				Object.entries(updates).filter(([_, value]) => value !== undefined)
+			);
 
-		const data: Partial<SelectNotificationSettings> = {
-			...cleanUpdates,
-		}
+			const data: Partial<SelectNotificationSettings> = {
+				...cleanUpdates,
+			}
 
-		const result = await db
-			.update(NOTIFICATIONS_SETTINGS_TABLE)
-			.set(data)
-			.where(eq(NOTIFICATIONS_SETTINGS_TABLE.user_id, user_id));
+			const result = await db
+				.update(NOTIFICATIONS_SETTINGS_TABLE)
+				.set(data)
+				.where(eq(NOTIFICATIONS_SETTINGS_TABLE.user_id, user_id));
 
-		return result;
+			return result;
+		});
 	},
 	updatePrivacySettingsWithUserId: async function (
 		user_id: SelectPrivacySettings["user_id"],
 		updates: Object,
 	) {
-		const cleanUpdates = Object.fromEntries(
-			Object.entries(updates).filter(([_, value]) => value !== undefined)
-		);
+		return queryDB(async () => {
+			const cleanUpdates = Object.fromEntries(
+				Object.entries(updates).filter(([_, value]) => value !== undefined)
+			);
 
-		const data: Partial<SelectPrivacySettings> = {
-			...cleanUpdates,
-		}
+			const data: Partial<SelectPrivacySettings> = {
+				...cleanUpdates,
+			}
 
-		const result = await db
-			.update(PRIVACY_SETTINGS_TABLE)
-			.set(data)
-			.where(eq(PRIVACY_SETTINGS_TABLE.user_id, user_id));
+			const result = await db
+				.update(PRIVACY_SETTINGS_TABLE)
+				.set(data)
+				.where(eq(PRIVACY_SETTINGS_TABLE.user_id, user_id));
 
-		return result;
+			return result;
+		});
 	},
 	deleteNotificationSettingsWithUserId: async function (user_id: SelectNotificationSettings["user_id"],) {
 		return queryDB(async () => {
