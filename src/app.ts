@@ -6,6 +6,8 @@ import 'dotenv/config';
 
 import authRoutes from '@/modules/auth/routes/auth-route';
 
+import messageRoutes from '@/modules/messages/routes/message-route';
+
 import notificationRoutes from '@/modules/profiles/routes/notification-route';
 import profileRoutes from '@/modules/profiles/routes/profile-route';
 import settingRoutes from '@/modules/profiles/routes/setting-route';
@@ -25,6 +27,9 @@ router.get('/', (ctx) => {
 // -- Mount sub-routes
 // Auth
 router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods());
+
+// Message
+router.use('/message', messageRoutes.routes(), messageRoutes.allowedMethods());
 
 // Profile
 router.use('/notification', notificationRoutes.routes(), notificationRoutes.allowedMethods());
