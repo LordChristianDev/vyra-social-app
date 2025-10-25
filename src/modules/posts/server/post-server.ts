@@ -37,7 +37,7 @@ export const QUERIES = {
 			return result;
 		});
 	},
-	fetchPostsWithAuthorId: async function (author_id: SelectPost["author_id"]) {
+	fetchAllPostsWithAuthorId: async function (author_id: SelectPost["author_id"]) {
 		return queryDB(async () => {
 			const result = await db
 				.select()
