@@ -8,6 +8,7 @@ import authRoutes from '@/modules/auth/routes/auth-route';
 
 import notificationRoutes from '@/modules/profiles/routes/notification-route';
 import profileRoutes from '@/modules/profiles/routes/profile-route';
+import settingRoutes from '@/modules/profiles/routes/setting-route';
 
 const app = new Koa();
 const router = new Router();
@@ -28,6 +29,7 @@ router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods());
 // Profile
 router.use('/notification', notificationRoutes.routes(), notificationRoutes.allowedMethods());
 router.use('/profile', profileRoutes.routes(), profileRoutes.allowedMethods());
+router.use('/settings', settingRoutes.routes(), settingRoutes.allowedMethods());
 
 // Register routes
 app.use(router.routes());
