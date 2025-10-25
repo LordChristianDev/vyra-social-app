@@ -8,6 +8,8 @@ import authRoutes from '@/modules/auth/routes/auth-route';
 
 import messageRoutes from '@/modules/messages/routes/message-route';
 
+import commentRoutes from '@/modules/posts/routes/comment-route';
+
 import notificationRoutes from '@/modules/profiles/routes/notification-route';
 import profileRoutes from '@/modules/profiles/routes/profile-route';
 import settingRoutes from '@/modules/profiles/routes/setting-route';
@@ -30,6 +32,9 @@ router.use('/auth', authRoutes.routes(), authRoutes.allowedMethods());
 
 // Message
 router.use('/message', messageRoutes.routes(), messageRoutes.allowedMethods());
+
+// Posts
+router.use('/comment', commentRoutes.routes(), commentRoutes.allowedMethods());
 
 // Profile
 router.use('/notification', notificationRoutes.routes(), notificationRoutes.allowedMethods());
