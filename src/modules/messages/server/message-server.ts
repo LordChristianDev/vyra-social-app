@@ -4,7 +4,6 @@ import { db } from "@config/db";
 import { queryDB } from "@/utils/try-catch";
 
 import {
-	InsertConversation,
 	SelectConversation,
 	conversationsTable as CONVERSATIONS_TABLE,
 	InsertParticipant,
@@ -16,7 +15,9 @@ import {
 } from "@/db/schema";
 
 export const QUERIES = {
-	fetchConversationsByProfileId: async function (profile_id: number) {
+	fetchConversationsByProfileId: async function (
+		profile_id: SelectParticipant["profile_id"]
+	) {
 		return queryDB(async () => {
 			const result = await db
 				.select({
@@ -44,7 +45,9 @@ export const QUERIES = {
 			return result;
 		});
 	},
-	fetchParticipantsByConversationId: async function (conversation_id: SelectParticipant["conversation_id"]) {
+	fetchParticipantsByConversationId: async function (
+		conversation_id: SelectParticipant["conversation_id"]
+	) {
 		return queryDB(async () => {
 			const result = await db
 				.select()
@@ -54,7 +57,9 @@ export const QUERIES = {
 			return result;
 		});
 	},
-	fetchParticipantsByProfileId: async function (profile_id: SelectParticipant["profile_id"]) {
+	fetchParticipantsByProfileId: async function (
+		profile_id: SelectParticipant["profile_id"]
+	) {
 		return queryDB(async () => {
 			const result = await db
 				.select()
@@ -64,7 +69,9 @@ export const QUERIES = {
 			return result;
 		});
 	},
-	fetchMessagesByConversationId: async function (conversation_id: SelectMessage["conversation_id"]) {
+	fetchMessagesByConversationId: async function (
+		conversation_id: SelectMessage["conversation_id"]
+	) {
 		return queryDB(async () => {
 			const result = await db
 				.select()
