@@ -41,7 +41,7 @@ router.use('/comment', commentRoutes.routes(), commentRoutes.allowedMethods());
 // Profile
 router.use('/notification', notificationRoutes.routes(), notificationRoutes.allowedMethods());
 router.use('/profile', profileRoutes.routes(), profileRoutes.allowedMethods());
-router.use('/settings', settingRoutes.routes(), settingRoutes.allowedMethods());
+router.use('/setting', settingRoutes.routes(), settingRoutes.allowedMethods());
 
 // Register routes
 app.use(router.routes());
