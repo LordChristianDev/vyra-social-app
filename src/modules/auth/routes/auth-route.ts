@@ -1,5 +1,9 @@
 import Router from '@koa/router';
-import { MUTATIONS, QUERIES } from '@/modules/auth/server/auth-server';
+import { InsertUser } from '@/db/schema';
+import {
+	QUERIES,
+	MUTATIONS,
+} from '@/modules/auth/server/auth-server';
 
 const router = new Router();
 
@@ -13,9 +17,12 @@ router.get('/', (ctx) => {
  */
 
 router.post('/create', async (ctx) => {
-	const uid: string = String(ctx.params.uid);
+	const request_body = ctx.request.body as { uid: InsertUser["google_uid"] };
+	const { uid } = request_body;
 
 	const [data, error] = await MUTATIONS.createUser(uid);
+
+	console.log("Server data:", data);
 
 	if (error) {
 		ctx.status = 500;
