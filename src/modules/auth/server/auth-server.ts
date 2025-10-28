@@ -23,7 +23,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(USERS_TABLE)
-				.where(eq(USERS_TABLE.id, id));
+				.where(eq(USERS_TABLE.id, id))
+				.limit(1);
 
 			return result;
 		});
@@ -33,7 +34,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(USERS_TABLE)
-				.where(eq(USERS_TABLE.google_uid, uid));
+				.where(eq(USERS_TABLE.google_uid, uid))
+				.limit(1);
 
 			return result;
 		});
