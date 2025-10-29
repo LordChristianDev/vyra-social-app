@@ -1,8 +1,6 @@
-import { ChevronRight, LogOut, Moon, Sun } from "lucide-react";
+import { ChevronRight, Moon, Sun } from "lucide-react";
 
-import { useAuth } from "@/context/use-auth";
 import { useTheme } from "@/context/use-theme";
-import { useProfile } from "@/context/use-profile";
 import { useRoutes } from "@/hooks/use-routes";
 
 import {
@@ -28,16 +26,7 @@ import type { AddtionalNavProp, NavigationProp } from "@/types/layout-types";
 import { mainNavs, moreNavs } from "@/services/layout-services";
 
 export const AppSidebar = () => {
-	const { move } = useRoutes();
-	const { signOut } = useAuth();
-	const { clearProfile } = useProfile();
 	const { isDarkMode, toggleTheme } = useTheme();
-
-	const handleLogout = () => {
-		signOut();
-		clearProfile();
-		move('/');
-	};
 
 	const renderNavs = (items: NavigationProp[]) => items.map((nav: NavigationProp, index) => {
 		return <SidebarNav key={index} navigation={nav} />
@@ -82,18 +71,6 @@ export const AppSidebar = () => {
 									<Moon className="h-4 w-4" />
 								}
 								<span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-
-						{/* Logout Button */}
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								onClick={handleLogout}
-								tooltip="Theme"
-								className="cursor-pointer"
-							>
-								<LogOut className="h-4 w-4 justify-start text-red-500 hover:text-red-700" />
-								<span className="text-red-500 hover:text-red-700">Log out</span>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>
