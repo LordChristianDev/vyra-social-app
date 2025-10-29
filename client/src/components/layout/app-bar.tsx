@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 import { useQuery } from '@tanstack/react-query';
 import { LogOut, Search } from "lucide-react";
 
@@ -21,20 +22,21 @@ import { HoverIcon } from "@/components/common/hover-icon";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 import { NotificationsPopover } from '@/features/personalization/components/notifications/notifications-popover';
 
-import { QUERIES } from '@/features/personalization/services/profile-services';
 import type { ProfileProp } from '@/features/personalization/types/profile-types';
+import { QUERIES } from '@/features/personalization/services/profile-services';
 
 export const Appbar = () => {
+	const { signOut: clerkSignOut } = useClerk();
 	const { move } = useRoutes();
-	const { user, signOut } = useAuth();
+	const { currentUser, signOut } = useAuth();
 	const { toggleSidebar } = useSidebar();
 	const { storeProfile, clearProfile } = useProfile();
 
 	const { data: profileData, isFetching: profileFetching } = useQuery({
-		queryKey: ['appbar-profile', user?.id],
+		queryKey: ['appbar-profile', currentUser?.id],
 		queryFn: async () => QUERIES.fetchProfileWithUserId(1),
 		refetchOnMount: (query) => !query.state.data,
-		enabled: !!user?.id,
+		enabled: !!currentUser?.id,
 	});
 
 	useEffect(() => {
@@ -49,20 +51,21 @@ export const Appbar = () => {
 	const initials = getInitials(fullName);
 	const avatar = avatar_url ?? "https://github.com/shadcn.png";
 
-	const handleLogout = () => {
+	const handleLogout = async () => {
+		await clerkSignOut();
 		signOut();
 		clearProfile();
 		move('/');
 	};
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className='px-4 flex items-center justify-between gap-20 h-14 w-full'>
 				{/* Logo */}
 				<div className="flex items-center gap-3">
 					<HoverIcon
 						src="/vyra.png"
-						className='w-[4rem]'
+						className='w-16'
 						toggle={toggleSidebar}
 					/>
 					<Link to="/home" className="flex items-center gap-2">
@@ -129,10 +132,13 @@ export const Appbar = () => {
 
 								{/* Logout */}
 								<DropdownMenuSeparator />
-								<DropdownMenuItem onClick={handleLogout} className="text-red-600">
+								<DropdownMenuItem
+									onClick={handleLogout}
+									className="text-red-600"
+								>
 									<div className='flex gap-2'>
 										<LogOut className="mr-2 h-4 w-4" />
-										<span className='!text-sm'>Log out</span>
+										<span className='text-sm'>Log out</span>
 									</div>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
