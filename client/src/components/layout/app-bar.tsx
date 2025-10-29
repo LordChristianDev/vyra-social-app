@@ -26,10 +26,10 @@ import type { ProfileProp } from '@/features/personalization/types/profile-types
 import { QUERIES } from '@/features/personalization/services/profile-services';
 
 export const Appbar = () => {
-	const { signOut: clerkSignOut } = useClerk();
 	const { move } = useRoutes();
-	const { currentUser, signOut } = useAuth();
 	const { toggleSidebar } = useSidebar();
+	const { currentUser, signOut } = useAuth();
+	const { signOut: clerkSignOut } = useClerk();
 	const { storeProfile, clearProfile } = useProfile();
 
 	const { data: profileData, isFetching: profileFetching } = useQuery({
