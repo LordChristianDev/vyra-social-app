@@ -1,6 +1,6 @@
 type SuccessResult<T> = readonly [T, null];
 type ErrorResult<E = Error> = readonly [null, E];
-type Result<T, E = Error> = SuccessResult<T> | ErrorResult<E>;
+export type Result<T, E = Error> = SuccessResult<T> | ErrorResult<E>;
 
 export async function tryCatch<T, E = Error>(
 	promise: Promise<T>
