@@ -1,35 +1,35 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
 
-import { getItem, removeItem, setItem } from "@/lib/local-storage";
+import { usePersistedState } from '@/hooks/use-persisted-state';
+import { getItem, removeItem } from "@/lib/local-storage";
 
 import type { UserProp } from "@/features/authentication/types/auth-types";
 
-const getLocalUser = (): UserProp => {
-	const data = getItem('user');
-	if (!data) return {} as UserProp;
+const getLocalUser = (): UserProp | null => {
+	const data = getItem('currentUser');
+	if (!data) return null;
 	return data;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuthHook = () => {
-	const [user, setUser] = useState<UserProp>(getLocalUser());
+	const [currentUser, setCurrentUser] = usePersistedState<UserProp | null>("currentUser", getLocalUser());
 
 	const storeUser = (data: UserProp) => {
 		if (!data) {
 			throw new Error('Data for user storage is empty');
 		}
-		setItem("user", data);
-		setUser(data);
+		setCurrentUser(data);
 	}
 
 	const signOut = async (): Promise<boolean> => {
-		removeItem('user');
-		setUser({} as UserProp);
+		setCurrentUser(null);
+		removeItem('currentUser');
 		return true;
 	}
 
-	return { user, storeUser, signOut };
+	return { currentUser, storeUser, signOut };
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -52,7 +52,7 @@ export const useAuth = (): AuthContextType => {
 };
 
 type AuthContextType = {
-	user: UserProp | null;
+	currentUser: UserProp | null;
 	storeUser: (data: UserProp) => void;
 	signOut: () => Promise<boolean>;
 };
