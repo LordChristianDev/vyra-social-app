@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SignInButton } from '@clerk/clerk-react';
 
 import {
 	Dialog,
@@ -8,7 +9,7 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "@/components/ui/dialog";
-import { OAuthButton } from "@stackframe/react";
+import { Button } from "@/components/ui/button";
 
 export const LoginDialog = ({ children }: { children: React.ReactNode }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -36,7 +37,21 @@ export const LoginDialog = ({ children }: { children: React.ReactNode }) => {
 					</DialogDescription>
 				</DialogHeader>
 
-				<OAuthButton provider="google" type="sign-in" />
+				<SignInButton>
+					<Button
+						type="submit"
+						className="w-full bg-violet-600 hover:bg-violet-300 cursor-pointer"
+					>
+						<span className="flex items-center gap-2">
+							<img
+								src="/svgs/google.svg"
+								alt="google"
+								className="size-4"
+							/>
+							<span className="p-18-semibold text-white"> Sign in with Google</span>
+						</span>
+					</Button>
+				</SignInButton>
 
 				<div className="flex justify-center">
 					<p className="text-sm text-gray-400">
