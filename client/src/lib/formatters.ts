@@ -56,3 +56,8 @@ export const timeAgo = (isoString: string) => {
 			: `${years} year${years > 1 ? "s" : ""} ago`;
 	}
 };
+
+export function formatTimestamp(timestamp: string | Date): string {
+	const date = new Date(timestamp);
+	return date.toISOString().split('T')[0];
+}
