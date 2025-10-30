@@ -29,7 +29,7 @@ export const ProfileCover = ({ profile }: { profile: ProfileProp }) => {
 				alt="Cover"
 				className="object-cover w-full h-full"
 			/>
-			<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+			<div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
 			{isCoverHovered && (
 				<UploadCoverDialog cover_url={cover_url ?? '/background/valley.webp'} >
 					<Button variant="check" className="absolute -bottom-1 -right-1 gap-2 cursor-pointer">
@@ -41,7 +41,7 @@ export const ProfileCover = ({ profile }: { profile: ProfileProp }) => {
 			)}
 
 			{/* Profile Avatar */}
-			<div className="absolute bottom-[1rem] left-[2rem]"
+			<div className="absolute bottom-4 left-8"
 				onMouseEnter={() => setIsAvatarHovered(true)}
 				onMouseLeave={() => setIsAvatarHovered(false)}
 			>
