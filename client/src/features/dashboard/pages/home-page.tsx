@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent } from "react";
+import { useAuth } from "@/context/use-auth";
 import { useQuery } from "@tanstack/react-query";
 
 import { useProfile } from "@/context/use-profile";
@@ -8,7 +9,8 @@ import { HomeOverview } from "@/features/dashboard/components/home/home-overview
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import { QUERIES as POST_QUERIES } from "@/features/dashboard/services/post-services";
-import { QUERIES as PROFILE_QUERIES } from "@/features/personalization/services/profile-services";
+import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
+
 
 export default function HomePage() {
 	return (
@@ -17,12 +19,13 @@ export default function HomePage() {
 };
 
 const HomeContent = () => {
+	const { currentUser } = useAuth();
 	const { storeProfile } = useProfile();
 
 	const { data: profileData, isFetching: profileFetching } = useQuery({
-		queryKey: ["profile-page"],
-		queryFn: () => PROFILE_QUERIES.fetchProfileWithUserId(1),
-		enabled: (query) => !query.state.data,
+		queryKey: ["home-profile", currentUser?.id],
+		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
+		enabled: (query) => !query.state.data && !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
@@ -30,7 +33,7 @@ const HomeContent = () => {
 	const { data: postsData, isFetching: postsFetching } = useQuery({
 		queryKey: ["home-posts"],
 		queryFn: () => POST_QUERIES.fetchPosts(),
-		enabled: (query) => !query.state.data,
+		enabled: (query) => !query.state.data && !profileFetching,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
