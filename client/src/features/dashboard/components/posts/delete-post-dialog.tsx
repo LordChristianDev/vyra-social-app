@@ -19,7 +19,11 @@ export type DeletePostDialogProp = {
 	post: PostProp;
 }
 
-export const DeletePostDialog = ({ open, onOpenChange, post }: DeletePostDialogProp) => {
+export const DeletePostDialog = ({
+	open,
+	onOpenChange,
+	// post
+}: DeletePostDialogProp) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const handleDelete = async () => {

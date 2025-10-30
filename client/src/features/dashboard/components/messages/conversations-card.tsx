@@ -87,7 +87,7 @@ export const ConversationsCard = ({
 						: "hover:bg-accent/30 border-transparent hover:border-accent/50"
 				)}
 			>
-				<div className="relative flex-shrink-0">
+				<div className="relative shrink-0">
 					<AvatarIcon
 						src={avatar_url ?? ""}
 						fallback={getInitials(fullName)}
@@ -113,7 +113,7 @@ export const ConversationsCard = ({
 				</div>
 
 				{numOfUnread > 0 && (
-					<Badge className="bg-gradient-primary text-primary-foreground shadow-sm min-w-[1.5rem] h-6 flex items-center justify-center flex-shrink-0">
+					<Badge className="bg-gradient-primary text-primary-foreground shadow-sm min-w-6 h-6 flex items-center justify-center shrink-0">
 						{numOfUnread}
 					</Badge>
 				)}

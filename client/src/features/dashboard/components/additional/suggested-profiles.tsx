@@ -1,6 +1,7 @@
 import { UserPlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/context/use-auth";
 import { createFullName, getInitials } from "@/lib/formatters";
 
 import {
@@ -12,14 +13,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
-import { QUERIES } from "@/features/personalization/services/profile-services";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 export const SuggestedProfiles = () => {
+	const { currentUser } = useAuth();
+
 	const { data: profilesData, isFetching: profilesFetching } = useQuery({
-		queryKey: ["suggested-profiles"],
-		queryFn: () => QUERIES.fetchSuggestedProfiles(1),
-		enabled: (query) => !query.state.data,
+		queryKey: ["suggested-profiles", currentUser?.id],
+		queryFn: () => PROFILE_CONTROLLER.FetchAllSuggestedProfiles(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});

@@ -2,6 +2,8 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
+import { useAuth } from "@/context/use-auth";
+import { useProfile } from "@/context/use-profile";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/show-toast";
 import { createFullName, getInitials } from "@/lib/formatters";
@@ -18,8 +20,9 @@ import { AvatarIcon } from "@/components/common/avatar-icon";
 import { LoadingHud } from "@/components/common/loading-hud";
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { QUERIES } from "@/features/personalization/services/profile-services";
-import { useProfile } from "@/context/use-profile";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 type StartConversationDialogProp = {
 	open: boolean;
@@ -31,17 +34,17 @@ export const StartConversationDialog = ({
 	onOpenChange,
 }: StartConversationDialogProp) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
 	const [search, setSearch] = useState<string>("")
 	const [profiles, setProfiles] = useState<ProfileProp[]>([]);
 
+	const { currentUser } = useAuth();
 	const { filterProfiles } = useProfile();
 
 	const { data: profilesData, isFetching: profilesFetching } = useQuery({
-		queryKey: ["suggested-convo-profiles"],
-		queryFn: () => QUERIES.fetchSuggestedProfiles(1),
+		queryKey: ["start-conversation-profiles", currentUser?.id],
+		queryFn: () => PROFILE_CONTROLLER.FetchAllSuggestedProfiles(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
-		enabled: open,
 		staleTime: 0,
 	});
 
@@ -101,7 +104,7 @@ export const StartConversationDialog = ({
 				)}
 				onClick={() => handleCreateNewConvo(id)}
 			>
-				<div className="relative flex-shrink-0">
+				<div className="relative shrink-0">
 					<AvatarIcon
 						src={avatar_url ?? ''}
 						fallback={getInitials(fullName)}

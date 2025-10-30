@@ -55,7 +55,7 @@ router.post('/create', async (ctx: Context) => {
  */
 
 router.get('/fetch-all', async (ctx) => {
-	const [data, error] = await QUERIES.fetchNotifications();
+	const [data, error] = await QUERIES.fetchAllNotifications();
 
 	if (error) {
 		ctx.status = 500;

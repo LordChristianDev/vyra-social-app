@@ -139,7 +139,7 @@ export const ActiveChat = ({ profile, activeConversation, conversationId }: Acti
 
 	return (
 		<Card className=" lg:col-span-2 shadow-soft border-0 h-full flex flex-col">
-			<CardHeader className="bg-gradient-to-r from-card to-card/50 border-b backdrop-blur-sm flex-shrink-0">
+			<CardHeader className="bg-linear-to-r from-card to-card/50 border-b backdrop-blur-sm shrink-0">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
 						<div className="relative">
@@ -172,7 +172,7 @@ export const ActiveChat = ({ profile, activeConversation, conversationId }: Acti
 				</ScrollArea>
 
 				{/* Message Input */}
-				<div className="p-5 bg-gradient-to-r from-card/50 to-card border-t rounded-xl flex-shrink-0">
+				<div className="p-5 bg-linear-to-r from-card/50 to-card border-t rounded-xl shrink-0">
 					<div className="flex items-center gap-3">
 						<div className="flex-1 relative">
 							<Input

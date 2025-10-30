@@ -1,0 +1,15 @@
+# .dockerignore (in root, next to Dockerfile)
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+dist
+client/dist
+client/node_modules
+*.md
+.vscode
+.idea
+coverage
+.DS_Store

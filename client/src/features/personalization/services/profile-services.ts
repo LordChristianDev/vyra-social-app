@@ -44,6 +44,20 @@ export const CONTROLLER = {
 
 		return true;
 	},
+	FetchAllSuggestedProfiles: async function (user_id: number): Promise<ProfileProp[]> {
+		if (!user_id) throw new Error("No Unique Identifier Found");
+
+		const [data, error] = await QUERIES.fetchAllProfiles();
+
+		if (error) throw new Error('Error fetching user:', error);
+		if (!data) return [];
+
+		let profiles: ProfileProp[] = [];
+
+		if (data) profiles = data;
+
+		return profiles;
+	},
 	/**
 	 * Fetch Profile with User ID
 	 * @param user_id

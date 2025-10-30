@@ -111,7 +111,7 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 					variant="destructive"
 					size="icon"
 					className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-					onClick={() => removeImage(id)}
+					onClick={() => removeImage(id ?? "")}
 				>
 					<X className="h-3 w-3" />
 				</Button>
@@ -121,10 +121,12 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 
 	// Handle Remove Image
 	const removeImage = (id: string) => {
+		if (!id) return;
+
 		setUploads(prev => {
 			const item = prev.find(item => item.id === id);
 			if (item) {
-				URL.revokeObjectURL(item.url);
+				URL.revokeObjectURL(item?.url ?? "");
 			}
 			return prev.filter(item => item.id !== id);
 		});
