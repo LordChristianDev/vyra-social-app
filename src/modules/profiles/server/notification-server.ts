@@ -10,7 +10,7 @@ import {
 } from "@/db/schema";
 
 export const QUERIES = {
-	fetchNotifications: async function () {
+	fetchAllNotifications: async function () {
 		return queryDB(async () => {
 			const result = await db
 				.select()
