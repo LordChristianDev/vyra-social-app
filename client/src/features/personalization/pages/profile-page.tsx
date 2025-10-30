@@ -1,6 +1,7 @@
 import { useEffectEvent, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/context/use-auth";
 import { useProfile } from "@/context/use-profile";
 
 import { ProfileOverview } from "@/features/personalization/components/profile/profile-overview";
@@ -8,7 +9,7 @@ import { ProfileOverview } from "@/features/personalization/components/profile/p
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import { QUERIES as POST_QUERIES } from "@/features/dashboard/services/post-services";
-import { QUERIES as PROFILE_QUERIES } from "@/features/personalization/services/profile-services";
+import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
 
 export default function ProfilePage() {
 	return (
@@ -17,17 +18,18 @@ export default function ProfilePage() {
 };
 
 const ProfileContent = () => {
+	const { currentUser } = useAuth();
 	const { storeProfile } = useProfile();
 
-	const { data: profileData, isFetching: profileFetching } = useQuery({
-		queryKey: ["profile-page"],
-		queryFn: () => PROFILE_QUERIES.fetchProfileWithUserId(1),
-		enabled: (query) => !query.state.data,
+	const { data: profileData, isLoading: profileLoading } = useQuery({
+		queryKey: ["profile-profile", currentUser?.id],
+		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
 
-	const { data: postsData, isFetching: postsFetching } = useQuery({
+	const { data: postsData, isLoading: postsLoading } = useQuery({
 		queryKey: ["profile-posts"],
 		queryFn: () => POST_QUERIES.fetchPostsByAuthorId(1),
 		enabled: (query) => !query.state.data,
@@ -36,7 +38,7 @@ const ProfileContent = () => {
 	});
 
 	const onFetch = useEffectEvent(() => {
-		if (profileData && !profileFetching) {
+		if (profileData && !profileLoading) {
 			storeProfile(profileData);
 		}
 	});
@@ -47,7 +49,7 @@ const ProfileContent = () => {
 
 	return (
 		<main className="p-8 mx-auto w-full">
-			{profileFetching || postsFetching ? (
+			{profileLoading || postsLoading ? (
 				<div className="animate-pulse space-y-4">
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 						<div className="lg:col-span-2 space-y-4">

@@ -7,7 +7,9 @@ import { useProfile } from "@/context/use-profile";
 import { SettingsOverview } from "@/features/personalization/components/settings/settings-overview";
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 export default function SettingsPage() {
 	return (
@@ -19,7 +21,7 @@ const SettingsContent = () => {
 	const { currentUser } = useAuth();
 	const { storeProfile } = useProfile();
 
-	const { data: profileData, isFetching: profileFetching } = useQuery({
+	const { data: profileData, isLoading: profileLoading } = useQuery({
 		queryKey: ["settings-profile", currentUser?.id],
 		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
 		refetchOnMount: !!currentUser?.id,
@@ -28,7 +30,7 @@ const SettingsContent = () => {
 	});
 
 	const onFetch = useEffectEvent(() => {
-		if (profileData && !profileFetching) {
+		if (profileData && !profileLoading) {
 			storeProfile(profileData);
 		}
 	});
@@ -39,7 +41,7 @@ const SettingsContent = () => {
 
 	return (
 		<main className="p-8 mx-auto w-full">
-			{profileFetching ? (
+			{profileLoading ? (
 				<div className="animate-pulse space-y-6">
 					<div className="h-8 w-full bg-muted rounded" />
 					<div className="h-128 w-full bg-muted rounded" />
