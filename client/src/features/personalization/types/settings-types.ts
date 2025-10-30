@@ -9,7 +9,7 @@ export const UpdateProfileFormSchema = z.object({
 	username: z.string().min(1, "Username is Required"),
 	bio: z.string().min(1, "Bio is Required"),
 	location: z.string().min(1, "Location is Required"),
-	description: z.string().min(1, "Location is Required"),
+	description: z.string().min(1, "Description is Required"),
 
 	// Optional Fields
 	middle_name: z.string().optional(),
