@@ -23,7 +23,7 @@ import { AvatarIcon } from "@/components/common/avatar-icon";
 import { NotificationsPopover } from '@/features/personalization/components/notifications/notifications-popover';
 
 import type { ProfileProp } from '@/features/personalization/types/profile-types';
-import { QUERIES } from '@/features/personalization/services/profile-services';
+import { CONTROLLER } from '@/features/personalization/services/profile-services';
 
 export const Appbar = () => {
 	const { move } = useRoutes();
@@ -34,7 +34,7 @@ export const Appbar = () => {
 
 	const { data: profileData, isFetching: profileFetching } = useQuery({
 		queryKey: ['appbar-profile', currentUser?.id],
-		queryFn: async () => QUERIES.fetchProfileWithUserId(1),
+		queryFn: async () => CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
 		refetchOnMount: (query) => !query.state.data,
 		enabled: !!currentUser?.id,
 	});
@@ -46,10 +46,7 @@ export const Appbar = () => {
 	}, [profileData, profileFetching]);
 
 	const { first_name, last_name, avatar_url } = profileData ?? {} as ProfileProp;
-
 	const fullName = createFullName(first_name, last_name);
-	const initials = getInitials(fullName);
-	const avatar = avatar_url ?? "https://github.com/shadcn.png";
 
 	const handleLogout = async () => {
 		await clerkSignOut();
@@ -96,8 +93,8 @@ export const Appbar = () => {
 										< div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
 									) : (
 										<AvatarIcon
-											src={avatar}
-											fallback={initials}
+											src={avatar_url ?? ""}
+											fallback={getInitials(fullName)}
 											size='sm'
 										/>
 									)}
@@ -110,8 +107,8 @@ export const Appbar = () => {
 										<div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
 									) : (
 										<AvatarIcon
-											src={avatar}
-											fallback={initials}
+											src={avatar_url ?? ""}
+											fallback={getInitials(fullName)}
 											size='sm'
 											className='ring-2 ring-primary/80 rounded-full cursor-pointer'
 										/>
