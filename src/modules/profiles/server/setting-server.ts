@@ -17,7 +17,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(NOTIFICATIONS_SETTINGS_TABLE)
-				.where(eq(NOTIFICATIONS_SETTINGS_TABLE.user_id, user_id));
+				.where(eq(NOTIFICATIONS_SETTINGS_TABLE.user_id, user_id))
+				.limit(1);
 
 			return result;
 		});
@@ -27,7 +28,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(PRIVACY_SETTINGS_TABLE)
-				.where(eq(PRIVACY_SETTINGS_TABLE.user_id, user_id));
+				.where(eq(PRIVACY_SETTINGS_TABLE.user_id, user_id))
+				.limit(1);
 
 			return result;
 		});
