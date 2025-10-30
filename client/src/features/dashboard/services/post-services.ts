@@ -1,6 +1,10 @@
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import type { CategoryProp, PostProp, TagProp } from "@/features/dashboard/types/dashboard-types";
-import { QUERIES as PROFILE_QUERIES } from "@/features/personalization/services/profile-services";
+import { mockProfiles } from "@/features/personalization/services/profile-services";
+
+/**
+ * Queries
+ */
 
 export const QUERIES = {
 	fetchPosts: async function (): Promise<PostProp[]> {
@@ -14,7 +18,7 @@ export const QUERIES = {
 			data.map(async (post) => {
 				let setPost: PostProp = post;
 
-				const author = await PROFILE_QUERIES.fetchProfileWithUserId(post.author_id);
+				const author = mockProfiles.find(profile => profile.user_id === post.author_id);
 				if (author) setPost = { ...setPost, author: author };
 
 				return setPost;
@@ -39,7 +43,7 @@ export const QUERIES = {
 			data.map(async (post) => {
 				let setPost: PostProp = post;
 
-				const author = await PROFILE_QUERIES.fetchProfileWithUserId(post.author_id);
+				const author = mockProfiles.find(profile => profile.user_id === post.author_id);
 				if (author) setPost = { ...setPost, author: author };
 
 				return setPost;
@@ -86,6 +90,10 @@ export const QUERIES = {
 		return categories;
 	},
 };
+
+/**
+ * Mutations
+ */
 
 export const MUTATIONS = {};
 
