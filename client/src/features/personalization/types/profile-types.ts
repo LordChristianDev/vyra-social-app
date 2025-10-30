@@ -31,8 +31,8 @@ export type ProfileProp = {
 };
 
 export type MediaProp = {
-	id: string;
+	id?: string;
 	file: File;
-	url: string;
+	url?: string;
 	type: string;
 };
