@@ -1,33 +1,95 @@
 import { useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@/context/use-auth";
 import { useRoutes } from "@/hooks/use-routes";
+import { CONTROLLER } from "@/features/authentication/services/auth-services";
 
-import { QUERIES } from "@/features/authentication/services/auth-services";
+export default function LoginPage() {
+	return <LoginContent />;
+}
 
-const LoginPage = () => {
+const LoginContent = () => {
+	const { isSignedIn, isLoaded, user } = useUser();
 	const { move } = useRoutes();
-	const { user, storeUser } = useAuth();
+	const { currentUser, storeUser, signOut } = useAuth();
 
-	const { data, isFetching } = useQuery({
-		queryKey: ["login-user"],
-		queryFn: async () => QUERIES.fetchProfileWithUid(),
-		enabled: true,
-		staleTime: 0
+	const { data, isFetching, isError } = useQuery({
+		queryKey: ["login-user", user?.id],
+		queryFn: async () => CONTROLLER.FetchUserWithUid(user?.id ?? ""),
+		enabled: !!user?.id && isSignedIn,
+		staleTime: 0,
+		retry: 1
 	});
 
+	// Wait for Clerk to load before doing anything
 	useEffect(() => {
-		if (user?.id) {
+		if (!isLoaded) {
+			console.log("Clerk is loading...");
+			return;
+		}
+
+		// Not signed in - redirect to home
+		if (!isSignedIn) {
+			console.log("Not signed in, redirecting to home");
+			signOut();
+			move("/");
+			return;
+		}
+
+	}, [isLoaded, isSignedIn]);
+
+	// Navigate to home when user data is ready
+	useEffect(() => {
+		if (currentUser?.id && user?.id) {
+			console.log("User data loaded, navigating to home");
 			move("/home");
 		}
-	}, [user]);
+	}, [currentUser, user]);
 
+	// Handle user data fetching and creation
 	useEffect(() => {
-		if (data && !isFetching) {
-			storeUser(data);
+		// Don't run until Clerk is loaded and user is signed in
+		if (!isLoaded || !isSignedIn || !user?.id) {
+			return;
 		}
-	}, [data, isFetching]);
+
+		// Still fetching
+		if (isFetching) {
+			console.log("Fetching user data...");
+			return;
+		}
+
+		// User exists in database
+		if (data) {
+			console.log("User found, storing data", data);
+			storeUser(data);
+			return;
+		}
+
+		// User doesn't exist - create new user
+		if (data === null) {
+			console.log("User not found, creating new user");
+			handleCreateUser();
+		}
+	}, [isLoaded, isSignedIn, user, data, isFetching, isError]);
+
+	const handleCreateUser = async () => {
+		try {
+			const newUser = await CONTROLLER.SetupNewUser(user?.id ?? "");
+			if (newUser) {
+				console.log("New user created successfully");
+				storeUser(newUser);
+			} else {
+				throw new Error("Failed to create user");
+			}
+		} catch (error) {
+			console.error("Error creating user:", error);
+			signOut();
+			move("/");
+		}
+	};
 
 	return (
 		<main className="flex items-center justify-center bg-background w-full min-h-screen">
@@ -40,6 +102,4 @@ const LoginPage = () => {
 			</div>
 		</main>
 	);
-}
-
-export default LoginPage;
+};
