@@ -1,8 +1,6 @@
 # .dockerignore (in root, next to Dockerfile)
 node_modules
 npm-debug.log
-.env
-.env.local
 .git
 .gitignore
 dist
