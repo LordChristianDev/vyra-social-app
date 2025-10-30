@@ -7,7 +7,19 @@ WORKDIR /app
 # Copy all project files
 COPY . .
 
-# 👇 Optionally extract other VITE_ vars into client/.env (safe)
+# -- Critical --
+
+# 👇 Accept build arg for Clerk key (Remove When Running Docker Locally)
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ARG VITE_IMAGE_KIT_PRIVATE_KEY
+
+# 👇 Expose it to the build (Remove When Running Docker Locally)
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY 
+ENV VITE_IMAGE_KIT_PRIVATE_KEY=$VITE_IMAGE_KIT_PRIVATE_KEY
+
+# -- Critial --
+
+# Optionally extract other VITE_ vars into client/.env (safe)
 RUN grep '^VITE_' .env > client/.env || true
 
 # Build client
