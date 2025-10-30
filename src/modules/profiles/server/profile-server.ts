@@ -38,7 +38,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(PROFILES_TABLE)
-				.where(eq(PROFILES_TABLE.id, id));
+				.where(eq(PROFILES_TABLE.id, id))
+				.limit(1);
 
 			return result;
 		});
@@ -48,7 +49,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(PROFILES_TABLE)
-				.where(eq(PROFILES_TABLE.user_id, user_id));
+				.where(eq(PROFILES_TABLE.user_id, user_id))
+				.limit(1);
 
 			return result;
 		});
@@ -58,7 +60,8 @@ export const QUERIES = {
 			const result = await db
 				.select()
 				.from(PROFILES_TABLE)
-				.where(eq(PROFILES_TABLE.username, username));
+				.where(eq(PROFILES_TABLE.username, username))
+				.limit(1);
 
 			return result;
 		});
@@ -131,18 +134,20 @@ export const MUTATIONS = {
 	) {
 		return queryDB(async () => {
 			const cleanUpdates = Object.fromEntries(
-				Object.entries(updates).filter(([_, value]) => value !== undefined)
+				Object.entries(updates).filter(([_, value]) => value !== undefined && value !== "")
 			);
 
 			const data: Partial<SelectProfile> = {
 				...cleanUpdates,
-			}
+				...(cleanUpdates.birth_date && {
+					birth_date: new Date(cleanUpdates.birth_date)
+				})
+			};
 
 			const result = await db
 				.update(PROFILES_TABLE)
 				.set(data)
 				.where(eq(PROFILES_TABLE.user_id, user_id));
-
 			return result;
 		});
 	},

@@ -74,7 +74,7 @@ router.get('/fetch-all', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some', async (ctx) => {
+router.post('/fetch-some', async (ctx) => {
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;
 
@@ -165,6 +165,28 @@ router.get('/fetch-username/:username', async (ctx) => {
 
 router.get('/fetch-all-suggested/:user_id', async (ctx) => {
 	const user_id: SelectProfile["user_id"] = Number(ctx.params.user_id);
+
+	const [data, error] = await QUERIES.fetchAllSuggestedProfiles(user_id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch profiles',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.post('/fetch-some-suggested/:user_id', async (ctx) => {
+	const user_id: SelectProfile["user_id"] = Number(ctx.params.user_id);
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;
 
@@ -191,28 +213,6 @@ router.get('/fetch-all-suggested/:user_id', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some-suggested/:user_id', async (ctx) => {
-	const user_id: SelectProfile["user_id"] = Number(ctx.params.user_id);
-
-	const [data, error] = await QUERIES.fetchAllSuggestedProfiles(user_id);
-
-	if (error) {
-		ctx.status = 500;
-		ctx.body = {
-			status: false,
-			error: 'Failed to fetch profiles',
-			message: error.message,
-		};
-		return;
-	}
-
-	ctx.status = 200;
-	ctx.body = {
-		status: true,
-		data,
-	};
-});
-
 /**
  * Update
  */
@@ -221,6 +221,8 @@ router.put('/update-profile-user-id/:user_id', async (ctx) => {
 	const user_id: SelectProfile["user_id"] = Number(ctx.params.user_id);
 	const request_body = ctx.request.body as { updates: object };
 	const { updates } = request_body;
+
+	console.log("This is request body", request_body);
 
 	const [data, error] = await MUTATIONS.updateProfileWithUserId(
 		user_id,
