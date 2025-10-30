@@ -24,7 +24,6 @@ export const useAuthHook = () => {
 	}
 
 	const signOut = async (): Promise<boolean> => {
-		setCurrentUser(null);
 		removeItem('currentUser');
 		return true;
 	}
