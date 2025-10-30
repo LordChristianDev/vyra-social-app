@@ -1,4 +1,8 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@/context/use-auth";
+import { showToast } from "@/lib/show-toast";
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -6,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import type { PrivacySettingsProp } from "@/features/personalization/types/settings-types";
+import { CONTROLLER as SETTINGS_CONTROLLER } from "@/features/personalization/services/settings-services";
 
 export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) => {
 	const [privacySettings, setPrivacySettings] = useState<Partial<PrivacySettingsProp>>({
@@ -13,18 +18,43 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 		is_public: privacy.is_public,
 		show_active: privacy.show_active,
 	});
+	const { currentUser } = useAuth();
+	const queryClient = useQueryClient();
 
-	const onUpdate = useEffectEvent(() => {
-		setPrivacySettings({
-			is_verified: privacy.is_verified,
-			is_public: privacy.is_public,
-			show_active: privacy.show_active,
+	const handlePrivacyUpdate = async (key: keyof PrivacySettingsProp, value: boolean) => {
+		setPrivacySettings({ ...privacySettings, [key]: value });
+
+		if (!currentUser?.id) {
+			showToast({
+				title: "Something went Wrong!",
+				description: "Unable to complete this update.",
+				variant: "error"
+			});
+			return;
+		}
+
+		const response = await SETTINGS_CONTROLLER
+			.UpdatePrivacySettingsWithUserId(
+				currentUser?.id,
+				{ ...privacySettings, [key]: value }
+			);
+
+		if (!response) {
+			showToast({
+				title: "Update Failed!",
+				description: "Failed to update privacy settings.",
+				variant: "error"
+			});
+			return;
+		}
+
+		showToast({
+			title: "Updated Settings Successfully!",
+			description: "Privacy settings has been updated.",
+			variant: "success"
 		});
-	});
-
-	useEffect(() => {
-		onUpdate();
-	}, []);
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
+	};
 
 	return (
 		<Card className="shadow-soft" >
@@ -43,7 +73,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 
 						<Switch
 							checked={privacySettings.is_verified}
-							onCheckedChange={(value) => setPrivacySettings({ ...privacySettings, is_verified: value })}
+							onCheckedChange={(value) => handlePrivacyUpdate("is_verified", value)}
 						/>
 					</div>
 					<Separator />
@@ -57,7 +87,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 
 						<Switch
 							checked={privacySettings.is_public}
-							onCheckedChange={(value) => setPrivacySettings({ ...privacySettings, is_public: value })}
+							onCheckedChange={(value) => handlePrivacyUpdate("is_public", value)}
 						/>
 					</div>
 					<Separator />
@@ -71,7 +101,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 
 						<Switch
 							checked={privacySettings.show_active}
-							onCheckedChange={(value) => setPrivacySettings({ ...privacySettings, show_active: value })}
+							onCheckedChange={(value) => handlePrivacyUpdate("show_active", value)}
 						/>
 					</div>
 				</div>

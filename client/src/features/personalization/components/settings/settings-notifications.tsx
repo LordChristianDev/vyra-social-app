@@ -1,4 +1,8 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@/context/use-auth";
+import { showToast } from "@/lib/show-toast";
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -6,6 +10,9 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import type { NotificationSettingsProp } from "@/features/personalization/types/settings-types";
+import {
+	CONTROLLER as SETTINGS_CONTROLLER
+} from "@/features/personalization/services/settings-services";
 
 export const SettingsNotifications = ({ notification }: { notification: NotificationSettingsProp }) => {
 	const [notificationSettings, setNotificationSettings] = useState<Partial<NotificationSettingsProp>>({
@@ -14,19 +21,43 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 		notify_follows: notification.notify_follows,
 		notify_messages: notification.notify_messages,
 	});
+	const { currentUser } = useAuth();
+	const queryClient = useQueryClient();
 
-	const onUpdate = useEffectEvent(() => {
-		setNotificationSettings({
-			notify_likes: notification.notify_likes,
-			notify_comments: notification.notify_comments,
-			notify_follows: notification.notify_follows,
-			notify_messages: notification.notify_messages,
+	const handleNotificationUpdate = async (key: keyof NotificationSettingsProp, value: boolean) => {
+		setNotificationSettings({ ...notificationSettings, [key]: value });
+
+		if (!currentUser?.id) {
+			showToast({
+				title: "Something went Wrong!",
+				description: "Unable to complete this update.",
+				variant: "error"
+			});
+			return;
+		}
+
+		const response = await SETTINGS_CONTROLLER
+			.UpdateNotificationSettingsWithUserId(
+				currentUser?.id,
+				{ ...notificationSettings, [key]: value }
+			);
+
+		if (!response) {
+			showToast({
+				title: "Update Failed!",
+				description: "Failed to update notification settings.",
+				variant: "error"
+			});
+			return;
+		}
+
+		showToast({
+			title: "Updated Settings Successfully!",
+			description: "Notification settings has been updated.",
+			variant: "success"
 		});
-	});
-
-	useEffect(() => {
-		onUpdate();
-	}, []);
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
+	};
 
 	return (
 		<Card className="shadow-soft" >
@@ -45,7 +76,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 
 						<Switch
 							checked={notificationSettings.notify_likes}
-							onCheckedChange={(value) => setNotificationSettings({ ...notificationSettings, notify_likes: value })}
+							onCheckedChange={(value) => handleNotificationUpdate("notify_likes", value)}
 						/>
 					</div>
 					<Separator />
@@ -59,7 +90,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 
 						<Switch
 							checked={notificationSettings.notify_comments}
-							onCheckedChange={(value) => setNotificationSettings({ ...notificationSettings, notify_comments: value })}
+							onCheckedChange={(value) => handleNotificationUpdate("notify_comments", value)}
 						/>
 					</div>
 					<Separator />
@@ -74,7 +105,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 						<Switch
 							id="follows"
 							checked={notificationSettings.notify_follows}
-							onCheckedChange={(value) => setNotificationSettings({ ...notificationSettings, notify_follows: value })}
+							onCheckedChange={(value) => handleNotificationUpdate("notify_follows", value)}
 						/>
 					</div>
 					<Separator />
@@ -89,7 +120,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 						<Switch
 							id="messages"
 							checked={notificationSettings.notify_messages}
-							onCheckedChange={(value) => setNotificationSettings({ ...notificationSettings, notify_messages: value })}
+							onCheckedChange={(value) => handleNotificationUpdate("notify_messages", value)}
 						/>
 					</div>
 				</div>

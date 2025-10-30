@@ -1,8 +1,11 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 
+import { useAuth } from "@/context/use-auth";
 import { showToast } from "@/lib/show-toast";
+import { formatTimestamp } from "@/lib/formatters";
 
 import {
 	Card,
@@ -20,53 +23,33 @@ import {
 	UpdateProfileFormSchema, type UpdateProfileFormProp
 } from "@/features/personalization/types/settings-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
+import { CONTROLLER } from "@/features/personalization/services/profile-services";
 
 export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const { currentUser } = useAuth();
+	const queryClient = useQueryClient();
 	const {
 		register,
 		handleSubmit,
-		reset,
 		control,
 		formState: { errors }
 	} = useForm<UpdateProfileFormProp>({
 		defaultValues: {
-			first_name: profile.first_name ?? "",
-			last_name: profile.last_name ?? "",
-			birth_date: profile.birth_date ?? "",
-
-			username: profile.username ?? "",
-			bio: profile.bio ?? "",
-			location: profile.location ?? "",
-			description: profile.description ?? "",
-
-			middle_name: profile.middle_name ?? "",
-			suffix: profile.suffix ?? "",
-			website_url: profile.website_url ?? "",
+			first_name: profile.first_name || "",
+			last_name: profile.last_name || "",
+			birth_date: profile.birth_date ? formatTimestamp(profile.birth_date) : "",
+			username: profile.username || "",
+			bio: profile.bio || "",
+			location: profile.location || "",
+			description: profile.description || "",
+			middle_name: profile.middle_name || "",
+			suffix: profile.suffix || "",
+			website_url: profile.website_url || "",
 		},
-		resolver: zodResolver(UpdateProfileFormSchema)
+		resolver: zodResolver(UpdateProfileFormSchema),
+		mode: 'onChange',
 	});
-
-	const onUpdate = useEffectEvent(() => {
-		reset({
-			first_name: profile.first_name ?? "",
-			last_name: profile.last_name ?? "",
-			birth_date: profile.birth_date ?? "",
-
-			username: profile.username ?? "",
-			bio: profile.bio ?? "",
-			location: profile.location ?? "",
-			description: profile.description ?? "",
-
-			middle_name: profile.middle_name ?? "",
-			suffix: profile.suffix ?? "",
-			website_url: profile.website_url ?? "",
-		});
-	});
-
-	useEffect(() => {
-		onUpdate();
-	}, []);
 
 	const onSubmit: SubmitHandler<UpdateProfileFormProp> = async (data) => {
 		if (!data) {
@@ -78,17 +61,40 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 			return;
 		}
 
+		if (!currentUser?.id) {
+			showToast({
+				title: "Something went Wrong!",
+				description: "Unable to complete this update.",
+				variant: "error"
+			});
+			return;
+		}
+
 		setIsLoading(true);
 
-		setTimeout(() => {
-			setIsLoading(false);
+		const response = await CONTROLLER
+			.UpdateProfileWithUserId(
+				currentUser.id,
+				data,
+			);
 
+		if (!response) {
 			showToast({
-				title: "Updated Profile Successfully!",
-				description: "Profile information has been updated.",
-				variant: "success"
+				title: "Update Failed!",
+				description: "Failed to update account information.",
+				variant: "error"
 			});
-		}, 3000);
+			setIsLoading(false);
+			return;
+		}
+
+		showToast({
+			title: "Updated Profile Successfully!",
+			description: "Profile information has been updated.",
+			variant: "success"
+		});
+		setIsLoading(false);
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	}
 
 	return (
@@ -217,7 +223,7 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 							<Input
 								{...register("website_url")}
 								type="text"
-								placeholder="Enter your website_url..."
+								placeholder="Enter your website url..."
 							/>
 							{errors.website_url && (
 								<p className="text-sm text-red-600 mt-1">
@@ -250,7 +256,6 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 							placeholder="Enter your description..."
 							className="min-h-[120px]"
 						/>
-
 						{errors.description && (
 							<p className="text-sm text-red-600 mt-1">
 								{errors.description.message}
