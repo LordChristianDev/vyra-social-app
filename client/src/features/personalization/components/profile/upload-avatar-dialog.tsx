@@ -1,5 +1,9 @@
 import { useRef, useState } from "react";
 import { Camera } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@/context/use-auth";
+import { showToast } from "@/lib/show-toast";
 
 import {
 	Dialog,
@@ -13,7 +17,9 @@ import { Button } from "@/components/ui/button";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
 import type { MediaProp } from "@/features/personalization/types/profile-types";
-import { showToast } from "@/lib/show-toast";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 type UploadAvatarDialog = {
 	avatar_url: string;
@@ -27,6 +33,9 @@ export const UploadAvatarDialog = ({ avatar_url, children }: UploadAvatarDialog)
 
 	const [upload, setUpload] = useState<MediaProp>({} as MediaProp);
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	const { currentUser } = useAuth();
+	const queryClient = useQueryClient();
 
 	// Handle Cover Upload
 	const handleUpload = (image: File | null) => {
@@ -60,16 +69,52 @@ export const UploadAvatarDialog = ({ avatar_url, children }: UploadAvatarDialog)
 		});
 	};
 
-	// Handle Save Cover
+	// Handle Save Avatar
 	const handleSave = async () => {
-		if (!upload) return;
+		if (!upload?.file) {
+			showToast({
+				title: "File is empty!",
+				description: "Unable to complete upload without uploaded file",
+				variant: "error"
+			});
+			return;
+		}
+
+		if (!currentUser?.id) {
+			showToast({
+				title: "Something went wrong!",
+				description: "Unable to complete upload without identifier",
+				variant: "error"
+			});
+			return;
+		}
 
 		setIsUploading(true);
 
-		setTimeout(() => {
+		const response = await PROFILE_CONTROLLER.UpdateAvatarWithUserId(
+			currentUser.id,
+			upload
+		);
+
+		if (!response) {
+			showToast({
+				title: "Update Failed!",
+				description: "Failed to update profile avatar.",
+				variant: "error"
+			});
 			setIsUploading(false);
-			setIsDialogOpen(false);
-		}, 1000);
+			return;
+		}
+
+		showToast({
+			title: "Updated Profile Avatar!",
+			description: "Successfully updated profile avatar.",
+			variant: "success"
+		});
+
+		setIsUploading(false);
+		setIsDialogOpen(false);
+		queryClient.invalidateQueries({ queryKey: ["profile-profile", currentUser?.id] });
 	};
 
 	return (
@@ -122,6 +167,7 @@ export const UploadAvatarDialog = ({ avatar_url, children }: UploadAvatarDialog)
 				<Button
 					type="submit"
 					onClick={handleSave}
+					disabled={isUploading}
 					className="flex bg-violet-600 hover:bg-violet-400 cursor-pointer">
 					{isUploading
 						? <span className="flex items-center">
