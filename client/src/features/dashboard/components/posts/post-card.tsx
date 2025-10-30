@@ -36,8 +36,8 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 
 	const {
 		author_id, created_at, content, images, youtube_embed, tags, comments, all_likes, all_saved, all_shares,
-		author: { first_name, last_name, username, avatar_url, privacy_settings: { is_verified } }
-	} = post;
+		author: { first_name, last_name, username, avatar_url, privacy_settings }
+	} = post as PostProp;
 
 	const [isLiked, setIsLiked] = useState<boolean>(all_likes.includes(profile.id));
 	const [isShared, setIsShared] = useState<boolean>(all_shares.includes(profile.id));
@@ -73,7 +73,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 						<div>
 							<div className="flex items-center gap-2">
 								<h4 className="font-semibold">{fullName}</h4>
-								{is_verified && (
+								{privacy_settings && privacy_settings.is_verified && (
 									<Badge className="px-1.5 py-0.5 text-xs text-primary-foreground bg-gradient-primary">
 										✓
 									</Badge>
