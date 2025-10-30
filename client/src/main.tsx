@@ -7,9 +7,10 @@ import { QueryClient, QueryClientProvider, } from '@tanstack/react-query';
 import './index.css';
 import App from './App.tsx';
 
-export const BASE_URL = import.meta.env.MODE === "development"
-  ? "http://localhost:4000/api"
-  : "/api";
+export const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:4000/api"
+    : `${window.location.origin}/api`;
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
