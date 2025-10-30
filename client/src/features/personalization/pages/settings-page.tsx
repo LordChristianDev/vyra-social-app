@@ -1,12 +1,13 @@
 import { useEffect, useEffectEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/context/use-auth";
 import { useProfile } from "@/context/use-profile";
 
 import { SettingsOverview } from "@/features/personalization/components/settings/settings-overview";
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { QUERIES } from "@/features/personalization/services/profile-services";
+import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
 
 export default function SettingsPage() {
 	return (
@@ -15,13 +16,14 @@ export default function SettingsPage() {
 };
 
 const SettingsContent = () => {
+	const { currentUser } = useAuth();
 	const { storeProfile } = useProfile();
 
 	const { data: profileData, isFetching: profileFetching } = useQuery({
-		queryKey: ["settings-profile"],
-		queryFn: () => QUERIES.fetchProfileWithUserId(1),
-		enabled: (query) => !query.state.data,
-		refetchOnMount: true,
+		queryKey: ["settings-profile", currentUser?.id],
+		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
+		refetchOnMount: !!currentUser?.id,
+		enabled: true,
 		staleTime: 0,
 	});
 
@@ -50,4 +52,3 @@ const SettingsContent = () => {
 		</main>
 	);
 };
-
