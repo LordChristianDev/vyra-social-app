@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useClerk } from '@clerk/clerk-react';
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "@/context/use-auth";
@@ -13,11 +14,13 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 // Auth check wrapper component
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const location = useLocation();
-	const isLoggedIn = !!getItem('user');
+	const isLoggedIn = !!getItem('currentUser');
 
 	if (!isLoggedIn && location.pathname !== '/login') {
-		return <Navigate to="/login" state={{ from: location }
-		} replace />;
+		return <Navigate
+			to="/login"
+			state={{ from: location }}
+			replace />;
 	}
 
 	return children;
@@ -28,16 +31,22 @@ export const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ c
 	const { move } = useRoutes()
 	const { signOut } = useAuth();
 	const { clearProfile } = useProfile();
+	const { signOut: clerkSignOut } = useClerk();
 
-	const isLoggedIn = !!getItem('user');
+	const isLoggedIn = !!getItem('currentUser');
 
 	useEffect(() => {
 		if (!isLoggedIn) {
-			signOut();
-			clearProfile();
-			move('/');
+			handleLogout();
 		}
 	}, [isLoggedIn]);
+
+	const handleLogout = async () => {
+		await clerkSignOut();
+		signOut();
+		clearProfile();
+		move('/');
+	};
 
 	return (
 		<SidebarProvider>
