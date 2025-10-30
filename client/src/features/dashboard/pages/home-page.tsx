@@ -11,7 +11,6 @@ import type { ProfileProp } from "@/features/personalization/types/profile-types
 import { QUERIES as POST_QUERIES } from "@/features/dashboard/services/post-services";
 import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
 
-
 export default function HomePage() {
 	return (
 		<HomeContent />

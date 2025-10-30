@@ -11,36 +11,32 @@ export default function LoginPage() {
 }
 
 const LoginContent = () => {
-	const { isSignedIn, isLoaded, user } = useUser();
 	const { move } = useRoutes();
+	const { isSignedIn, isLoaded, user } = useUser();
 	const { currentUser, storeUser, signOut } = useAuth();
 
 	const { data, isFetching, isError } = useQuery({
 		queryKey: ["login-user", user?.id],
 		queryFn: async () => CONTROLLER.FetchUserWithUid(user?.id ?? ""),
-		enabled: !!user?.id && isSignedIn,
+		enabled: isLoaded && isSignedIn && !!user?.id,
 		staleTime: 0,
-		retry: 1
+		retry: 1,
 	});
 
-	// Wait for Clerk to load before doing anything
 	useEffect(() => {
 		if (!isLoaded) {
 			console.log("Clerk is loading...");
 			return;
 		}
 
-		// Not signed in - redirect to home
+		// If Clerk has finished loading and the user is NOT signed in, then sign out + go home
 		if (!isSignedIn) {
 			console.log("Not signed in, redirecting to home");
 			signOut();
 			move("/");
-			return;
 		}
-
 	}, [isLoaded, isSignedIn]);
 
-	// Navigate to home when user data is ready
 	useEffect(() => {
 		if (currentUser?.id && user?.id) {
 			console.log("User data loaded, navigating to home");
@@ -48,9 +44,7 @@ const LoginContent = () => {
 		}
 	}, [currentUser, user]);
 
-	// Handle user data fetching and creation
 	useEffect(() => {
-		// Don't run until Clerk is loaded and user is signed in
 		if (!isLoaded || !isSignedIn || !user?.id) {
 			return;
 		}

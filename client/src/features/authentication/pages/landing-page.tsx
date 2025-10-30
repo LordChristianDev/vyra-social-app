@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
-import { getItem } from "@/lib/local-storage";
+import { useAuth } from "@/context/use-auth";
 import { useRoutes } from "@/hooks/use-routes";
+import { getItem } from "@/lib/local-storage";
 
 import { Navbar } from "@/features/authentication/components/landing/navbar";
 import { HeroSection } from "@/features/authentication/components/landing/hero-section";
@@ -13,18 +14,33 @@ import { FooterSection } from "@/features/authentication/components/landing/foot
 
 export default function LandingPage() {
 	const { move } = useRoutes();
+	const { signOut } = useAuth();
 	const { isSignedIn } = useUser();
+	const { signOut: clerkSignOut } = useClerk();
+
 	const isLoggedIn = !!getItem('currentUser');
 
 	useEffect(() => {
+		// Do nothing until Clerk has finished loading
+		if (typeof isSignedIn === "undefined" || typeof isLoggedIn === "undefined") return;
+
+		// If the user is signed in with Clerk but not yet logged in your app → go to login page
+		if (isSignedIn && !isLoggedIn) {
+			move("/login");
+			return;
+		}
+
+		// If user is fully logged in → go home
 		if (isLoggedIn) {
 			move("/home");
 			return;
 		}
 
-		if (isSignedIn) {
-			move("/login");
-			return;
+		// If Clerk finished loading and user is definitely not signed in → sign out cleanly
+		if (!isSignedIn && !isLoggedIn) {
+			console.log("User not signed in, clearing sessions");
+			signOut();
+			clerkSignOut();
 		}
 	}, [isLoggedIn, isSignedIn]);
 
