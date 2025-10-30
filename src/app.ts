@@ -6,7 +6,11 @@ import serve from 'koa-static';
 import send from 'koa-send';
 import path from 'path';
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 import authRoutes from '@/modules/auth/routes/auth-route';
 import messageRoutes from '@/modules/messages/routes/message-route';
@@ -17,10 +21,14 @@ import profileRoutes from '@/modules/profiles/routes/profile-route';
 import settingRoutes from '@/modules/profiles/routes/setting-route';
 
 const app = new Koa();
-const router = new Router();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true,
+}));
 app.use(bodyParser());
 
 // API Routes with /api prefix
