@@ -12,7 +12,7 @@ export const BASE_URL =
     ? "http://localhost:4000/api"
     : `${window.location.origin}/api`;
 
-// const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 const queryClient = new QueryClient();
 
@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ClerkProvider publishableKey={"pk_test_dGVhY2hpbmctcGFudGhlci0zOC5jbGVyay5hY2NvdW50cy5kZXYk"}>
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
           <App />
         </ClerkProvider>
       </BrowserRouter>

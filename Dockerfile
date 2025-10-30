@@ -4,9 +4,19 @@
 FROM node:20-alpine AS client-build
 WORKDIR /app
 
+# Copy all project files
 COPY . .
+
+# 👇 Define build argument (comes from Render env)
+ARG VITE_CLERK_PUBLISHABLE_KEY
+
+# 👇 Ensure it's available during the client build
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+
+# 👇 Optionally extract other VITE_ vars into client/.env (safe)
 RUN grep '^VITE_' .env > client/.env || true
 
+# Build client
 WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm ci --prefer-offline --no-audit
@@ -21,6 +31,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig*.json ./
 RUN npm ci --prefer-offline --no-audit
+
 COPY src/ ./src/
 COPY config/ ./config/
 RUN npm run build
@@ -37,10 +48,13 @@ RUN apk add --no-cache ca-certificates
 COPY package*.json ./
 RUN npm ci --only=production --prefer-offline --no-audit
 
+# Copy built artifacts
 COPY --from=server-build /app/dist ./dist
 COPY --from=client-build /app/client/dist ./client/dist
 
+# Set production environment
 ENV NODE_ENV=production
+
 EXPOSE 4000
 
 CMD ["node", "dist/src/app.js"]
