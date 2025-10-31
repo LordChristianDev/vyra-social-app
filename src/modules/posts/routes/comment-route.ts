@@ -73,7 +73,7 @@ router.get('/fetch-all/:post_id', async (ctx) => {
 	};
 });
 
-router.get('/fetch-all/:post_id', async (ctx) => {
+router.post('/fetch-some/:post_id', async (ctx) => {
 	const post_id: SelectComment["post_id"] = Number(ctx.params.post_id);
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;

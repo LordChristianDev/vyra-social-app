@@ -76,7 +76,7 @@ router.get('/fetch-all', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some', async (ctx) => {
+router.post('/fetch-some', async (ctx) => {
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;
 
@@ -122,7 +122,7 @@ router.get('/fetch-all-with-author-id/:author_id', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some-with-author-id/:author_id', async (ctx) => {
+router.post('/fetch-some-with-author-id/:author_id', async (ctx) => {
 	const author_id: SelectPost["author_id"] = Number(ctx.params.author_id);
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;
