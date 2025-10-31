@@ -47,7 +47,7 @@ export const CONTROLLER = {
 	FetchAllSuggestedProfiles: async function (user_id: number): Promise<ProfileProp[]> {
 		if (!user_id) throw new Error("No Unique Identifier Found");
 
-		const [data, error] = await QUERIES.fetchAllProfiles();
+		const [data, error] = await QUERIES.fetchAllSuggestedProfiles(user_id);
 
 		if (error) throw new Error('Error fetching user:', error);
 		if (!data) return [];
@@ -162,6 +162,21 @@ export const CONTROLLER = {
 		if (!result) return false;
 
 		return true;
+	},
+	UploadImageToBucket: async function (user_id: number, cover: MediaProp): Promise<string> {
+		if (!user_id) throw new Error("No Unique Identifier Found");
+
+		const { file } = cover;
+
+		const ext = file.name.split('.').pop();
+		const name = `${user_id}_${Date.now()}.${ext}`;
+
+		const [url, error] = await MUTATIONS.uploadImageToBucket(name, "covers", cover);
+
+		if (error) throw new Error('Error updating user:', error);
+		if (!url) return "";
+
+		return url;
 	},
 };
 
