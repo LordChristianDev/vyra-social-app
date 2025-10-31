@@ -12,6 +12,7 @@ export type PostProp = {
 	tags: TagProp[] | null;
 	comments: CommentProp[] | null;
 
+	all_tags: number[];
 	all_likes: number[];
 	all_saved: number[];
 	all_shares: number[];
