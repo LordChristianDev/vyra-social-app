@@ -3,12 +3,12 @@ import { Hash, TrendingUp } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { QUERIES } from "@/features/dashboard/services/post-services";
+import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
 
 export const TrendingTopics = () => {
 	const { data: tagsData, isFetching: tagsFetching } = useQuery({
 		queryKey: ["trending-topics"],
-		queryFn: () => QUERIES.fetchTrendingTags(),
+		queryFn: () => POST_CONTROLLER.FetchTrendingTags(),
 		enabled: (query) => !query.state.data,
 		refetchOnMount: true,
 		staleTime: 0,
@@ -43,18 +43,18 @@ export const TrendingTopics = () => {
 				<div className="h-72 w-full bg-muted rounded" />
 			</div>
 		) : (
-			<Card className="shadow-soft border-border/50">
-				<CardHeader>
+			(tagsData && tagsData.length > 0 && <Card className="shadow-soft border-border/50">
+				< CardHeader >
 					<CardTitle className="text-lg font-semibold flex items-center gap-4">
 						<TrendingUp className="h-5 w-5 text-primary" />
 						What's happening
 					</CardTitle >
-				</CardHeader >
+				</ CardHeader>
 
 				<CardContent className="space-y-2">
 					{renderTrendingTopics}
 				</CardContent>
-			</Card >
+			</Card>)
 		)
 	);
 };
