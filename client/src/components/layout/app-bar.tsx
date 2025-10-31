@@ -35,8 +35,8 @@ export const Appbar = () => {
 	const { data: profileData, isFetching: profileFetching } = useQuery({
 		queryKey: ['appbar-profile', currentUser?.id],
 		queryFn: async () => CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
-		refetchOnMount: (query) => !query.state.data,
 		enabled: !!currentUser?.id,
+		refetchOnMount: true,
 	});
 
 	useEffect(() => {
