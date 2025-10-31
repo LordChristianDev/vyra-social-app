@@ -31,6 +31,7 @@ type CreatePostDialogProp = {
 }
 
 export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) => {
+	const queryClient = useQueryClient();
 	const { data: tagsData, isFetching: tagsFetching } = useQuery({
 		queryKey: ["home-tags"],
 		queryFn: () => POST_CONTROLLER.FetchTags(),
@@ -41,7 +42,6 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-	const queryClient = useQueryClient();
 
 	const [content, setContent] = useState<string>('');
 	const [uploads, setUploads] = useState<MediaProp[]>([]);
@@ -209,7 +209,7 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 		}
 
 		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
-		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
 
 		showToast({
 			title: "Post Created Successfully!",
@@ -333,7 +333,7 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 						<Button
 							onClick={handleSubmitPost}
 							disabled={isLoading || content.length > maxChars}
-							className="bg-gradient-primary text-primary-foreground cursor-pointer"
+							className="bg-gradient-primary text-gray-200 cursor-pointer"
 						>
 							{isLoading ? "Posting..." : "Post"}
 						</Button>

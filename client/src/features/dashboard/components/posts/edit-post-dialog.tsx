@@ -14,13 +14,13 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog";
+import { MultiSelectComboBox } from "@/components/ui/multi-combo-box";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import {
 	CONTROLLER as POST_CONTROLLER
 } from "@/features/dashboard/services/post-services";
-import { MultiSelectComboBox } from "@/components/ui/multi-combo-box";
 
 type EditPostDialogProp = {
 	open: boolean;
@@ -103,6 +103,9 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 			return;
 		}
 
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
+
 		showToast({
 			title: "Post Updated Successfully!",
 			description: "Your post has been updated.",
@@ -112,9 +115,6 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 		setIsLoading(false);
 		onOpenChange(false);
 		setPostContent("");
-
-		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
-		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	};
 
 	return (
@@ -188,7 +188,7 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 						<Button
 							onClick={handleEdit}
 							disabled={isLoading || postContent.length > maxChars || !postContent.trim()}
-							className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+							className="bg-gradient-primary text-gray-200 hover:opacity-90"
 						>
 							{isLoading ? "Updating..." : "Update Post"}
 						</Button>
