@@ -98,7 +98,7 @@ export const NotificationsPopover = () => {
 				<Button variant="ghost" size="icon" className="relative cursor-pointer">
 					<Bell className="h-5 w-5" />
 					{unreadCount > 0 && (
-						<Badge className="absolute -top-1 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-gradient-primary text-primary-foreground">
+						<Badge className="absolute -top-1 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-gradient-primary text-white">
 							{unreadCount > 9 ? '9+' : unreadCount}
 						</Badge>
 					)}
