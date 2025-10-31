@@ -60,4 +60,18 @@ export const timeAgo = (isoString: string) => {
 export function formatTimestamp(timestamp: string | Date): string {
 	const date = new Date(timestamp);
 	return date.toISOString().split('T')[0];
-}
+};
+
+export const extractYouTubeId = (content: string) => {
+	if (!content) return null;
+
+	const pattern = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?:[?&]|$)/;
+	const match = content.match(pattern);
+
+	return match ? match[1] : null;
+};
+
+export const removeYouTubeLinks = (content: string) => {
+	const pattern = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)[A-Za-z0-9_-]{11}(?:[^\s]*)?|youtu\.be\/[A-Za-z0-9_-]{11}(?:[^\s]*)?)/g;
+	return content.replace(pattern, '').trim();
+};
