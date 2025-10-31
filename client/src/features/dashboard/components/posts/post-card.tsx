@@ -3,7 +3,7 @@ import { Bookmark, Edit, Heart, MessageCircle, MoreHorizontal, Share, Trash2 } f
 
 import { useAuth } from "@/context/use-auth";
 import { cn } from "@/lib/utils";
-import { createFullName, getInitials, timeAgo } from "@/lib/formatters";
+import { createFullName, getInitials, removeYouTubeLinks, timeAgo } from "@/lib/formatters";
 
 import {
 	Card,
@@ -128,7 +128,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 			</CardHeader>
 
 			<CardContent>
-				<p className="mb-4 text-sm">{content}</p>
+				<p className="mb-4 text-sm">{removeYouTubeLinks(content).trim()}</p>
 
 				{images && images.length > 0 && (
 					<ShowPostImages images={images} />

@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { showToast } from "@/lib/show-toast";
-import { createFullName, extractYouTubeId, getInitials, removeYouTubeLinks } from "@/lib/formatters";
+import { createFullName, extractYouTubeId, getInitials } from "@/lib/formatters";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,7 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 			post.id,
 			{
 				...values,
-				content: removeYouTubeLinks(postContent).trim()
+				content: postContent.trim()
 			},
 		);
 

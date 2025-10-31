@@ -4,7 +4,7 @@ import { Image, Upload, X } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { showToast } from "@/lib/show-toast";
-import { createFullName, extractYouTubeId, getInitials, removeYouTubeLinks } from "@/lib/formatters";
+import { createFullName, extractYouTubeId, getInitials } from "@/lib/formatters";
 
 import {
 	Dialog,
@@ -172,7 +172,7 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 
 		const response = await POST_CONTROLLER.CreateNewPost(
 			user_id,
-			removeYouTubeLinks(content).trim(),
+			content.trim(),
 			values
 		);
 
