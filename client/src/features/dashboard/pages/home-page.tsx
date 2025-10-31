@@ -8,7 +8,7 @@ import { HomeOverview } from "@/features/dashboard/components/home/home-overview
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { QUERIES as POST_QUERIES } from "@/features/dashboard/services/post-services";
+import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
 import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
 
 export default function HomePage() {
@@ -21,24 +21,24 @@ const HomeContent = () => {
 	const { currentUser } = useAuth();
 	const { storeProfile } = useProfile();
 
-	const { data: profileData, isFetching: profileFetching } = useQuery({
+	const { data: profileData, isLoading: profileLoading } = useQuery({
 		queryKey: ["home-profile", currentUser?.id],
 		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
-		enabled: (query) => !query.state.data && !!currentUser?.id,
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
 
-	const { data: postsData, isFetching: postsFetching } = useQuery({
+	const { data: postsData, isLoading: postsLoading } = useQuery({
 		queryKey: ["home-posts"],
-		queryFn: () => POST_QUERIES.fetchPosts(),
-		enabled: (query) => !query.state.data && !profileFetching,
+		queryFn: () => POST_CONTROLLER.FetchAllPosts(),
+		enabled: !profileLoading,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
 
 	const onFetch = useEffectEvent(() => {
-		if (profileData && !profileFetching) {
+		if (profileData && !profileLoading) {
 			storeProfile(profileData);
 		}
 	});
@@ -49,7 +49,7 @@ const HomeContent = () => {
 
 	return (
 		<main className="p-8 mx-auto w-full">
-			{postsFetching ? (
+			{profileLoading || postsLoading ? (
 				<div className="animate-pulse space-y-4">
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 						<div className="lg:col-span-2 space-y-4">

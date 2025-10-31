@@ -8,7 +8,7 @@ import { ProfileOverview } from "@/features/personalization/components/profile/p
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { QUERIES as POST_QUERIES } from "@/features/dashboard/services/post-services";
+import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
 import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
 
 export default function ProfilePage() {
@@ -30,9 +30,9 @@ const ProfileContent = () => {
 	});
 
 	const { data: postsData, isLoading: postsLoading } = useQuery({
-		queryKey: ["profile-posts"],
-		queryFn: () => POST_QUERIES.fetchPostsByAuthorId(1),
-		enabled: (query) => !query.state.data,
+		queryKey: ["profile-posts", currentUser?.id],
+		queryFn: () => POST_CONTROLLER.FetchAllPostsWithAuthorId(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
