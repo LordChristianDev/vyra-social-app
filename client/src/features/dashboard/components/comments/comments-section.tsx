@@ -1,20 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Send } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { useProfile } from "@/context/use-profile";
 import { showToast } from "@/lib/show-toast";
+import { createFullName, getInitials } from "@/lib/formatters";
 
 import { Button } from "@/components/ui/button";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 import { CommentCard } from "@/features/dashboard/components/comments/comment-card";
 
-import type { CommentProp } from "@/features/dashboard/types/dashboard-types";
-import { createFullName, getInitials } from "@/lib/formatters";
+import type { CommentProp, PostProp } from "@/features/dashboard/types/dashboard-types";
+import {
+	CONTROLLER as COMMENT_CONTROLLER
+} from "@/features/dashboard/services/comment-services";
 
-export const CommentsSection = ({ comments }: { comments: CommentProp[] }) => {
+type CommentSectionProp = {
+	post: PostProp
+	comments: CommentProp[];
+}
+
+export const CommentsSection = ({ post, comments }: CommentSectionProp) => {
+	const queryClient = useQueryClient();
+
 	const { profile } = useProfile();
-	const { first_name, last_name, avatar_url } = profile;
+	const { first_name, last_name, avatar_url, user_id } = profile;
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [visibleComments, setVisibleComments] = useState<CommentProp[]>([]);
@@ -43,15 +54,34 @@ export const CommentsSection = ({ comments }: { comments: CommentProp[] }) => {
 		}
 		setIsLoading(true);
 
-		setTimeout(() => {
+		const response = await COMMENT_CONTROLLER.CreateNewComment(
+			post.id,
+			user_id,
+			newComment.trim(),
+		);
+
+		if (!response) {
+			showToast({
+				title: "Creation Failed!",
+				description: "Failed to create comment.",
+				variant: "error"
+			});
 			setIsLoading(false);
 			setNewComment("");
-			showToast({
-				title: "Comment posted!",
-				description: "Your comment has been added successfully",
-				variant: "success"
-			});
-		}, 3000);
+			return;
+		}
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
+
+		showToast({
+			title: "Comment posted!",
+			description: "Your comment has been added successfully",
+			variant: "success"
+		});
+
+		setIsLoading(false);
+		setNewComment("");
 	};
 
 	const renderAllComments = visibleComments.map((comment, index) => {
@@ -83,7 +113,7 @@ export const CommentsSection = ({ comments }: { comments: CommentProp[] }) => {
 						onClick={handleSubmit}
 						disabled={!newComment.trim() || isLoading}
 						size="icon"
-						className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+						className="bg-gradient-primary text-white hover:opacity-90"
 					>
 						<Send className="h-4 w-4" />
 					</Button>
