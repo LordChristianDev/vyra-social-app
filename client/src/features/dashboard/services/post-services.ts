@@ -90,6 +90,17 @@ export const CONTROLLER = {
 				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
 				if (comments) setPost = { ...setPost, comments };
 
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
 				return setPost;
 			})
 		);
@@ -119,6 +130,17 @@ export const CONTROLLER = {
 				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
 				if (comments) setPost = { ...setPost, comments };
 
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
 				return setPost;
 			})
 		);
@@ -146,6 +168,17 @@ export const CONTROLLER = {
 
 				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
 				if (comments) setPost = { ...setPost, comments };
+
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
 
 				return setPost;
 			})
@@ -181,6 +214,17 @@ export const CONTROLLER = {
 				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
 				if (comments) setPost = { ...setPost, comments };
 
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
 				return setPost;
 			})
 		);
@@ -197,7 +241,39 @@ export const CONTROLLER = {
 		if (error) throw new Error('Error fetching tags:', error);
 		if (!tags) return [];
 
-		return tags;
+		const result = await Promise.all(
+			tags.map(async (tag) => {
+				const { category_id } = tag;
+				let setCategory: TagProp = tag;
+
+				const category = await CONTROLLER.FetchCategoryWithId(category_id);
+				if (category) setCategory = { ...setCategory, category: category };
+
+				return setCategory;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches a tag with the given ID
+	 * @param id 
+	 * @returns TagProp | null
+	 */
+	FetchTagWithId: async function (id: number): Promise<TagProp | null> {
+		const [tag, error] = await QUERIES.fetchTagWithId(id);
+
+		if (error) throw new Error('Error fetching tag:', error);
+		if (!tag) return null;
+
+		let setTag: TagProp = tag;
+
+		if (tag.category_id) {
+			const category = await CONTROLLER.FetchCategoryWithId(tag.category_id);
+			if (category) setTag = { ...setTag, category };
+		}
+
+		return setTag;
 	},
 	/**
 	 * Fetches trending tags
@@ -209,7 +285,32 @@ export const CONTROLLER = {
 		if (error) throw new Error('Error fetching tags:', error);
 		if (!tags) return [];
 
-		return tags;
+		const result = await Promise.all(
+			tags.map(async (tag) => {
+				const { category_id } = tag;
+				let setCategory: TagProp = tag;
+
+				const category = await CONTROLLER.FetchCategoryWithId(category_id);
+				if (category) setCategory = { ...setCategory, category: category };
+
+				return setCategory;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches a category with the given ID
+	 * @param id 
+	 * @returns CategoryProp | null
+	 */
+	FetchCategoryWithId: async function (id: number): Promise<CategoryProp | null> {
+		const [category, error] = await QUERIES.fetchCategoryWithId(id);
+
+		if (error) throw new Error('Error fetching category:', error);
+		if (!category) return null;
+
+		return category;
 	},
 	/**
 	 * Fetches trending categories
@@ -405,6 +506,30 @@ export const QUERIES = {
 			})()
 		);
 	},
+	fetchTagWithId: async function (id: number): Promise<Result<TagProp | null>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-tag-with-id/${id}`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Tag
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: TagProp | null = null;
+
+				if (data.status === true && data.data) result = data.data.length > 0 ? data.data[0] : null;
+
+				return result;
+			})()
+		);
+	},
 	fetchTrendingTags: async function (): Promise<Result<TagProp[]>> {
 		return tryCatch(
 			(async () => {
@@ -424,6 +549,30 @@ export const QUERIES = {
 				let result: TagProp[] = [];
 
 				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchCategoryWithId: async function (id: number): Promise<Result<CategoryProp | null>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-category-with-id/${id}`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Category
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: CategoryProp | null = null;
+
+				if (data.status === true && data.data) result = data.data.length > 0 ? data.data[0] : null;
 
 				return result;
 			})()
