@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { showToast } from "@/lib/show-toast";
@@ -20,6 +20,7 @@ import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import {
 	CONTROLLER as POST_CONTROLLER
 } from "@/features/dashboard/services/post-services";
+import { MultiSelectComboBox } from "@/components/ui/multi-combo-box";
 
 type EditPostDialogProp = {
 	open: boolean;
@@ -28,14 +29,23 @@ type EditPostDialogProp = {
 };
 
 export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp) => {
+	const { data: tagsData, isFetching: tagsFetching } = useQuery({
+		queryKey: ["home-tags"],
+		queryFn: () => POST_CONTROLLER.FetchTags(),
+		enabled: true,
+		refetchOnMount: true,
+		staleTime: 0,
+	});
+
 	const {
 		content,
 		author: { first_name, last_name, avatar_url }
 	} = post;
+	const queryClient = useQueryClient();
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [postContent, setPostContent] = useState<string>(content);
-	const queryClient = useQueryClient();
+	const [selectedTags, setSelectedTags] = useState<string[]>(post.all_tags?.map(tag => String(tag)) ?? []);
 
 	const maxChars: number = 250;
 	const fullName: string = createFullName(first_name, last_name);
@@ -53,6 +63,15 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 		setIsLoading(true);
 
 		let values: Object = {};
+
+		// Check Current Tags
+		if (selectedTags.length > 0) {
+			const setTags = selectedTags.map(tag => Number(tag));
+			values = {
+				...values,
+				all_tags: setTags,
+			}
+		}
 
 		// Check if Youtube URL Exist
 		const youtubeId = extractYouTubeId(postContent);
@@ -138,6 +157,24 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 							</Badge>
 						)}
 					</div>
+
+					{tagsFetching ? (
+						<div className="animate-pulse space-y-4">
+							<div className="h-12 w-full bg-muted rounded" />
+						</div>
+					) : (
+						<MultiSelectComboBox
+							dataSource={(tagsData ?? []).map(tag => ({
+								name: String(tag.id),
+								label: tag.title,
+							}))}
+							title="Tags"
+							value={selectedTags}
+							onChange={(e) => setSelectedTags(e)}
+							maxDisplay={3}
+						/>
+					)}
+
 
 					{/* Actions */}
 					<div className="flex justify-end gap-2">

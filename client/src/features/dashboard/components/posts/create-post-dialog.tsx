@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image, Upload, X } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
@@ -23,6 +23,7 @@ import type { MediaProp, ProfileProp } from "@/features/personalization/types/pr
 import {
 	CONTROLLER as POST_CONTROLLER
 } from "@/features/dashboard/services/post-services";
+import { MultiSelectComboBox } from "@/components/ui/multi-combo-box";
 
 type CreatePostDialogProp = {
 	profile: ProfileProp;
@@ -30,12 +31,21 @@ type CreatePostDialogProp = {
 }
 
 export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) => {
+	const { data: tagsData, isFetching: tagsFetching } = useQuery({
+		queryKey: ["home-tags"],
+		queryFn: () => POST_CONTROLLER.FetchTags(),
+		enabled: true,
+		refetchOnMount: true,
+		staleTime: 0,
+	});
+
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 	const queryClient = useQueryClient();
 
 	const [content, setContent] = useState<string>('');
 	const [uploads, setUploads] = useState<MediaProp[]>([]);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
 	const { user_id, first_name, last_name, avatar_url } = profile;
 	const fullName = createFullName(first_name, last_name);
@@ -151,6 +161,15 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 
 		let values: Object = {};
 
+		// Check Current Tags
+		if (selectedTags.length > 0) {
+			const setTags = selectedTags.map(tag => Number(tag));
+			values = {
+				...values,
+				all_tags: setTags,
+			}
+		}
+
 		// Check if Youtube URL Exist
 		const youtubeId = extractYouTubeId(content);
 
@@ -189,6 +208,9 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 			return;
 		}
 
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
+
 		showToast({
 			title: "Post Created Successfully!",
 			description: "Your post has been created.",
@@ -198,9 +220,6 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 		setIsDialogOpen(false);
 		setUploads([]);
 		setContent("");
-
-		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
-		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	};
 
 	return (
@@ -247,6 +266,23 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 							</Badge>
 						)}
 					</div>
+
+					{tagsFetching ? (
+						<div className="animate-pulse space-y-4">
+							<div className="h-12 w-full bg-muted rounded" />
+						</div>
+					) : (
+						<MultiSelectComboBox
+							dataSource={(tagsData ?? []).map(tag => ({
+								name: String(tag.id),
+								label: tag.title,
+							}))}
+							title="Tags"
+							value={selectedTags}
+							onChange={(e) => setSelectedTags(e)}
+							maxDisplay={3}
+						/>
+					)}
 
 					{/* Media upload area */}
 					<div
