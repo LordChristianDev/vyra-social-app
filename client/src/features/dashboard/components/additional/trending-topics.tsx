@@ -4,6 +4,7 @@ import { Hash, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
+import type { TagProp } from "@/features/dashboard/types/dashboard-types";
 
 export const TrendingTopics = () => {
 	const { data: tagsData, isFetching: tagsFetching } = useQuery({
@@ -15,7 +16,7 @@ export const TrendingTopics = () => {
 	});
 
 	const renderTrendingTopics = (tagsData ?? []).map((topic, index) => {
-		const { id, title, popularity, category: { title: trending } } = topic;
+		const { id, title, popularity, category: { title: trending } } = topic as TagProp;
 
 		return (
 			<div key={id} className="p-3 rounded-lg hover:bg-accent/50 transition-smooth cursor-pointer group">
