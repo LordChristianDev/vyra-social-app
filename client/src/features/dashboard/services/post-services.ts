@@ -1,93 +1,457 @@
-import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import type { CategoryProp, PostProp, TagProp } from "@/features/dashboard/types/dashboard-types";
-import { mockProfiles } from "@/features/personalization/services/profile-services";
+import { BASE_URL } from "@/main";
+import { tryCatch, type Result } from "@/lib/try-catch";
+
+import type {
+	CategoryProp,
+	PostProp,
+	TagProp
+} from "@/features/dashboard/types/dashboard-types";
+import type {
+	MediaProp,
+} from "@/features/personalization/types/profile-types";
+import {
+	CONTROLLER as COMMENT_CONTROLLER
+} from "@/features/dashboard/services/comment-services";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
+
+/**
+ * Controller
+ */
+
+export const CONTROLLER = {
+	/**
+	 * Creates a new post
+	 * @param author_id 
+	 * @param content 
+	 * @param args 
+	 * @returns boolean
+	 */
+	CreateNewPost: async function (
+		author_id: number,
+		content: string,
+		args: Object
+	): Promise<boolean> {
+		if (!author_id) throw new Error("No Unique Identifier Found");
+
+		if (!content) throw new Error("Content is Needed");
+
+		const [post, error] = await MUTATIONS.createPost(author_id, content, args);
+
+		if (error) throw new Error('Error creating post:', error);
+		if (!post) return false;
+
+		return true;
+	},
+	/**
+	 * Uploads post images to the bucket
+	 * @param author_id 
+	 * @param uploads 
+	 * @returns string[]
+	 */
+	UploadPostImages: async function (
+		author_id: number,
+		uploads: MediaProp[]
+	): Promise<string[]> {
+		if (!author_id) throw new Error("No Unique Identifier");
+
+		if (!uploads) throw new Error("No Uploads Found");
+
+		const urls: string[] = await Promise.all(
+			uploads.map(async (upload) => {
+				const url = await PROFILE_CONTROLLER.UploadImageToBucket(author_id, upload);
+				return url;
+			})
+		);
+
+		const filteredUrls = urls.filter(url => url !== "");
+
+		return filteredUrls;
+	},
+	/**
+	 * Fetches all posts
+	 * @returns PostProp[]
+	 */
+	FetchAllPosts: async function (): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchAllPosts();
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches some posts
+	 * @param page 
+	 * @param pageSize 
+	 * @returns PostProp[]
+	 */
+	FetchSomePosts: async function (page: number, pageSize: number): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchSomePosts(page, pageSize);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches all posts with the given author ID
+	 * @param author_id 
+	 * @returns PostProp[]
+	 */
+	FetchAllPostsWithAuthorId: async function (author_id: number): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchAllPostsWithAuthorId(author_id);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches some posts with the given author ID
+	 * @param author_id 
+	 * @param page 
+	 * @param pageSize 
+	 * @returns PostProp[]
+	 */
+	FetchSomePostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number
+	): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchSomePostsWithAuthorId(author_id, page, pageSize);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches all tags
+	 * @returns TagProp[]
+	 */
+	FetchTags: async function (): Promise<TagProp[]> {
+		const [tags, error] = await QUERIES.fetchTags();
+
+		if (error) throw new Error('Error fetching tags:', error);
+		if (!tags) return [];
+
+		return tags;
+	},
+	/**
+	 * Fetches trending tags
+	 * @returns TagProp[]
+	 */
+	FetchTrendingTags: async function (): Promise<TagProp[]> {
+		const [tags, error] = await QUERIES.fetchTrendingTags();
+
+		if (error) throw new Error('Error fetching tags:', error);
+		if (!tags) return [];
+
+		return tags;
+	},
+	/**
+	 * Fetches trending categories
+	 * @returns CategoryProp[]
+	 */
+	FetchTrendingCategories: async function (): Promise<CategoryProp[]> {
+		const [categories, error] = await QUERIES.fetchTrendingCategories();
+
+		if (error) throw new Error('Error fetching categories:', error);
+		if (!categories) return [];
+
+		return categories;
+	},
+	/**
+	 * Edits a post with the given ID
+	 * @param id 
+	 * @param updates 
+	 * @returns boolean
+	 */
+	EditPostWithId: async function (
+		id: number,
+		updates: Object
+	): Promise<boolean> {
+		if (!id) throw new Error("No Unique Identifier Found");
+
+		if (!updates) throw new Error("Updates are Needed");
+
+		const [post, error] = await MUTATIONS.updatePostWithId(id, updates);
+
+		if (error) throw new Error('Error editing post:', error);
+		if (!post) return false;
+
+		return true;
+	},
+	/**
+	 * Deletes a post with the given ID
+	 * @param id 
+	 * @returns boolean
+	 */
+	DeletePostWithId: async function (id: number): Promise<boolean> {
+		if (!id) throw new Error("No Unique Identifier Found");
+
+		const [post, error] = await MUTATIONS.deletePostWithId(id);
+
+		if (error) throw new Error('Error deleting post:', error);
+		if (!post) return false;
+
+		return true;
+	},
+};
 
 /**
  * Queries
  */
 
 export const QUERIES = {
-	fetchPosts: async function (): Promise<PostProp[]> {
-		await new Promise(resolve => setTimeout(resolve, 1000));
-
-		const data = mockPost as PostProp[];
-
-		if (!data) return [];
-
-		let posts: PostProp[] = await Promise.all(
-			data.map(async (post) => {
-				let setPost: PostProp = post;
-
-				const author = mockProfiles.find(profile => profile.user_id === post.author_id);
-				if (author) setPost = { ...setPost, author: author };
-
-				return setPost;
-			})
-		);
-
-		posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-		return posts;
-	},
-	fetchPostsByAuthorId: async function (author_id: number): Promise<PostProp[]> {
-		if (!author_id) throw new Error("No Unique Identifier!");
-
-		await new Promise(resolve => setTimeout(resolve, 1000));
-
-		// fetching Data by ID
-		const data = mockPost.filter(post => post.author_id === author_id) as PostProp[];
-
-		if (!data) return [];
-
-		let posts: PostProp[] = await Promise.all(
-			data.map(async (post) => {
-				let setPost: PostProp = post;
-
-				const author = mockProfiles.find(profile => profile.user_id === post.author_id);
-				if (author) setPost = { ...setPost, author: author };
-
-				return setPost;
-			})
-		);
-
-		posts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-		return posts;
-	},
-	fetchTrendingTags: async function (): Promise<TagProp[]> {
-		await new Promise(resolve => setTimeout(resolve, 1000));
-
-		let tags: TagProp[] = [];
-
-		const data = mockTags.slice(0, 5) as TagProp[];
-
-		tags = await Promise.all(
-			data.map((tag) => {
-				let setTag: TagProp = tag;
-
-				const posts = mockPost.filter(post => {
-					if (post.tags) {
-						return post.tags.some((postTag) => postTag.id === tag.id);
-					}
+	fetchAllPosts: async function (): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-all`, {
+					method: "GET",
 				});
-				if (posts) setTag = { ...setTag, popularity: posts.length };
 
-				return setTag;
-			})
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
 		);
-
-		tags.sort((a, b) => a.popularity - b.popularity);
-
-		return tags;
 	},
-	fetchCategories: async function (): Promise<CategoryProp[]> {
-		await new Promise(resolve => setTimeout(resolve, 1000));
+	fetchSomePosts: async function (
+		page: number,
+		pageSize: number,
+	): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-some`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						page,
+						pageSize,
+					}),
+				});
+				const data = await response.json();
 
-		let categories: CategoryProp[] = [];
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
 
-		categories = mockCategories.slice(0.5).sort((a, b) => a.popularity - b.popularity);
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
 
-		return categories;
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchAllPostsWithAuthorId: async function (author_id: number): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-all-with-author-id/${author_id}`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchSomePostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number,
+	): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-some-with-author-id/${author_id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						page,
+						pageSize,
+					}),
+				});
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchTags: async function (): Promise<Result<TagProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-tags`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Tags
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: TagProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchTrendingTags: async function (): Promise<Result<TagProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-trending-tags`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Tags
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: TagProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchTrendingCategories: async function (): Promise<Result<CategoryProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-trending-tags`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Tags
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: CategoryProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
 	},
 };
 
@@ -95,298 +459,83 @@ export const QUERIES = {
  * Mutations
  */
 
-export const MUTATIONS = {};
-
-const mockCategories: CategoryProp[] = [
-	{
-		id: 1,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "Frameworks",
-		popularity: 1240,
-	},
-	{
-		id: 2,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "Design",
-		popularity: 890,
-	},
-	{
-		id: 3,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "Technology",
-		popularity: 670,
-	},
-	{
-		id: 4,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "Business",
-		popularity: 540,
-	},
-];
-
-const mockPost: Partial<PostProp>[] = [
-	{
-		id: 1,
-		author_id: 1,
-		created_at: "2025-09-20 16:48:11.644153+00",
-		updated_at: "2025-09-20 16:48:11.644153+00",
-
-		content: "This is my first post !",
-		youtube_embed: null,
-		images: null,
-		tags: null,
-		comments: [
-			{
-				id: 2,
-				author_id: 2,
-				created_at: "2025-09-26 18:38:11.644153+00",
-				content: "Welcome !",
-				all_likes: [],
-				author: {
-					id: 1,
-					user_id: 1,
-					created_at: "2025-09-20 16:48:11.644153+00",
-					updated_at: "2025-09-20 16:48:11.644153+00",
-
-					first_name: "Shad",
-					middle_name: null,
-					suffix: null,
-					last_name: "Meister",
-					birth_date: "1994-04-06",
-					avatar_url: "https://github.com/shadcn.png",
-					cover_url: "https://ilbnjaefxdwtqdjtnzgy.supabase.co/storage/v1/object/public/covers/1_1758526509534.jpg",
-
-					username: "mister_olive",
-					bio: "Software Engineer | React Dev | Hackathon 1st Placer",
-					location: "Cebu, Philippines",
-					website_url: "https://lord-christian-portfolio.vercel.app/",
-					description: "I am new to this platform, please teach me how this works.",
-
-					all_following: [0, 1, 2, 3, 4, 5],
-					all_followers: [3, 4, 6, 1, 2, 1, 23, 6, 2],
-
-					notif_settings: {
-						id: 1,
-						user_id: 1,
-
-						notify_likes: false,
-						notify_comments: false,
-						notify_follows: false,
-						notify_messages: false,
+export const MUTATIONS = {
+	createPost: async (
+		author_id: number,
+		content: string,
+		args: Object,
+	): Promise<Result<boolean>> => {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/create`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
 					},
-					privacy_settings: {
-						id: 1,
-						user_id: 1,
+					body: JSON.stringify({
+						author_id,
+						content,
+						args,
+					}),
+				});
+				const data = await response.json();
 
-						is_verified: false,
-						is_public: false,
-						show_active: false,
-					}
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
 				}
-			}
-		],
 
-		all_likes: [1],
-		all_saved: [],
-		all_shares: [],
+				// Failed to Create Post
+				if (data.status === false) return false;
+
+				return true;
+			})()
+		);
 	},
-	{
-		id: 2,
-		author_id: 1,
-		created_at: "2025-09-21 17:48:11.644153+00",
-		updated_at: "2025-09-21 17:48:11.644153+00",
-
-		content: "This site is amazing !",
-		youtube_embed: "nlnH-_Etzbo?si=TAUKFHkZN5iFdPJ1",
-		images: null,
-		tags: null,
-		comments: null,
-
-		all_likes: [2],
-		all_saved: [],
-		all_shares: [],
-	},
-	{
-		id: 3,
-		author_id: 2,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		updated_at: "2025-09-23 18:08:11.644153+00",
-
-		content: "Cool Images that I love !",
-		youtube_embed: "g9_wkyAfi3c?si=pjW2Pfes5spoP3PC",
-		images: [
-			"https://qoxcrtuminwsohrwrzda.supabase.co/storage/v1/object/public/avatars/86_1757155168601.png",
-			"https://qoxcrtuminwsohrwrzda.supabase.co/storage/v1/object/public/avatars/86_1757155225225.png",
-		],
-		tags: [
-			{
-				id: 1,
-				category_id: 2,
-				created_at: "2025-09-23 18:08:11.644153+00",
-				title: "UI Design",
-				popularity: 1,
-				category: mockCategories[1],
-			},
-			{
-				id: 2,
-				category_id: 1,
-				created_at: "2025-09-23 18:08:11.644153+00",
-				title: "React",
-				popularity: 1,
-				category: mockCategories[0],
-			},
-		],
-		comments: [
-			{
-				id: 1,
-				author_id: 1,
-				created_at: "2025-09-23 19:28:11.644153+00",
-				content: "This looks cool !",
-				all_likes: [],
-				author: {
-					id: 1,
-					user_id: 1,
-					created_at: "2025-09-20 16:48:11.644153+00",
-					updated_at: "2025-09-20 16:48:11.644153+00",
-
-					first_name: "Shad",
-					middle_name: null,
-					suffix: null,
-					last_name: "Meister",
-					birth_date: "1994-04-06",
-					avatar_url: "https://github.com/shadcn.png",
-					cover_url: "https://ilbnjaefxdwtqdjtnzgy.supabase.co/storage/v1/object/public/covers/1_1758526509534.jpg",
-
-					username: "mister_olive",
-					bio: "Software Engineer | React Dev | Hackathon 1st Placer",
-					location: "Cebu, Philippines",
-					website_url: "https://lord-christian-portfolio.vercel.app/",
-					description: "I am new to this platform, please teach me how this works.",
-
-					all_following: [0, 1, 2, 3, 4, 5],
-					all_followers: [3, 4, 6, 1, 2, 1, 23, 6, 2],
-
-					notif_settings: {
-						id: 1,
-						user_id: 1,
-
-						notify_likes: false,
-						notify_comments: false,
-						notify_follows: false,
-						notify_messages: false,
+	updatePostWithId: async (
+		id: number,
+		updates: Object,
+	): Promise<Result<boolean>> => {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/update/${id}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
 					},
-					privacy_settings: {
-						id: 1,
-						user_id: 1,
+					body: JSON.stringify({
+						updates
+					}),
+				});
+				const data = await response.json();
 
-						is_verified: false,
-						is_public: false,
-						show_active: false,
-					}
-				} as ProfileProp,
-			},
-		],
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
 
-		all_likes: [1, 2, 4],
-		all_saved: [],
-		all_shares: [],
+				// Failed to Update Post
+				if (data.status === false) return false;
+
+				return true;
+			})()
+		);
 	},
-	{
-		id: 4,
-		author_id: 3,
-		created_at: "2025-09-23 20:08:11.644153+00",
-		updated_at: "2025-09-23 20:08:11.644153+00",
+	deletePostWithId: async (id: number): Promise<Result<boolean>> => {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/delete/${id}`, {
+					method: "DELETE",
+				});
+				const data = await response.json();
 
-		content: "AWS Just Bombed ! ",
-		youtube_embed: null,
-		images: null,
-		tags: [
-			{
-				id: 3,
-				category_id: 3,
-				created_at: "2025-09-23 18:08:11.644153+00",
-				title: "AWS",
-				popularity: 1,
-				category: mockCategories[2],
-			},
-		],
-		comments: [
-			{
-				id: 1,
-				author_id: 1,
-				created_at: "2025-09-23 19:28:11.644153+00",
-				content: "This looks cool !",
-				all_likes: [],
-				author: {
-					id: 1,
-					user_id: 1,
-					created_at: "2025-09-20 16:48:11.644153+00",
-					updated_at: "2025-09-20 16:48:11.644153+00",
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
 
-					first_name: "Shad",
-					middle_name: null,
-					suffix: null,
-					last_name: "Meister",
-					birth_date: "1994-04-06",
-					avatar_url: "https://github.com/shadcn.png",
-					cover_url: "https://ilbnjaefxdwtqdjtnzgy.supabase.co/storage/v1/object/public/covers/1_1758526509534.jpg",
+				// Failed to Delete Post
+				if (data.status === false) return false;
 
-					username: "mister_olive",
-					bio: "Software Engineer | React Dev | Hackathon 1st Placer",
-					location: "Cebu, Philippines",
-					website_url: "https://lord-christian-portfolio.vercel.app/",
-					description: "I am new to this platform, please teach me how this works.",
-
-					all_following: [0, 1, 2, 3, 4, 5],
-					all_followers: [3, 4, 6, 1, 2, 1, 23, 6, 2],
-
-					notif_settings: {
-						id: 1,
-						user_id: 1,
-
-						notify_likes: false,
-						notify_comments: false,
-						notify_follows: false,
-						notify_messages: false,
-					},
-					privacy_settings: {
-						id: 1,
-						user_id: 1,
-
-						is_verified: false,
-						is_public: false,
-						show_active: false,
-					}
-				} as ProfileProp,
-			},
-		],
-
-		all_likes: [1, 2, 4],
-		all_saved: [],
-		all_shares: [],
+				return true;
+			})()
+		);
 	},
-];
-
-const mockTags: Partial<TagProp>[] = [
-	{
-		id: 1,
-		category_id: 2,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "UI Design",
-		category: mockCategories[1],
-	},
-	{
-		id: 2,
-		category_id: 1,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "React",
-		category: mockCategories[0],
-	},
-	{
-		id: 3,
-		category_id: 3,
-		created_at: "2025-09-23 18:08:11.644153+00",
-		title: "AWS",
-		category: mockCategories[2],
-	},
-];
+};
