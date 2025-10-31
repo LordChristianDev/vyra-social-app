@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bookmark, Edit, Heart, MessageCircle, MoreHorizontal, Share, Trash2 } from "lucide-react";
 
-import { useProfile } from "@/context/use-profile";
+import { useAuth } from "@/context/use-auth";
 import { cn } from "@/lib/utils";
 import { createFullName, getInitials, timeAgo } from "@/lib/formatters";
 
@@ -29,7 +29,7 @@ import { CommentsSection } from "@/features/dashboard/components/comments/commen
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 
 export const PostCard = ({ post }: { post: PostProp }) => {
-	const { profile } = useProfile();
+	const { currentUser } = useAuth();
 	const [showComments, setShowComments] = useState<boolean>(false);
 	const [isEditPostDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
 	const [isDeletePostDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -39,18 +39,35 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 		author: { first_name, last_name, username, avatar_url, privacy_settings }
 	} = post as PostProp;
 
-	const [isLiked, setIsLiked] = useState<boolean>(all_likes.includes(profile.id));
-	const [isShared, setIsShared] = useState<boolean>(all_shares.includes(profile.id));
-	const [isSaved, setIsSaved] = useState<boolean>(all_saved.includes(profile.id));
+	const [isLiked, setIsLiked] = useState<boolean>(all_likes.includes(currentUser?.id ?? 0));
+	const [isShared, setIsShared] = useState<boolean>(all_shares.includes(currentUser?.id ?? 0));
+	const [isSaved, setIsSaved] = useState<boolean>(all_saved.includes(currentUser?.id ?? 0));
+
+	const [likes, setLikes] = useState<number[]>(all_likes);
+	const [shares, setShares] = useState<number[]>(all_shares);
 
 	// Strings
 	const fullName: string = createFullName(first_name, last_name);
 
 	// Booleans
-	const isOwnPost: boolean = profile.id == author_id;
+	const isOwnPost: boolean = currentUser?.id == author_id;
 
-	const handleLikes = () => setIsLiked(!isLiked);
-	const handleShares = () => setIsShared(!isShared);
+	const handleLikes = () => {
+		setIsLiked(!isLiked)
+		setLikes(isLiked ? likes.filter(id =>
+			id !== currentUser?.id
+		) : [
+			...likes, currentUser?.id ?? 0
+		]);
+	};
+	const handleShares = () => {
+		setIsShared(!isShared);
+		setShares(isShared ? shares.filter(id =>
+			id !== currentUser?.id
+		) : [
+			...shares, currentUser?.id ?? 0
+		]);
+	};
 	const handleSaves = () => setIsSaved(!isSaved);
 
 	const renderTags = (tags ?? []).map(tags => (
@@ -154,7 +171,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 								'h-4 w-4',
 								isLiked ? "fill-current" : ""
 							)} />
-							<span className="text-sm">{all_likes.length}</span>
+							<span className="text-sm">{likes.length}</span>
 						</Button>
 
 						<Button
@@ -187,7 +204,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 								isShared ? "fill-current" : ""
 							)}
 							/>
-							<span className="text-sm">{all_shares.length}</span>
+							<span className="text-sm">{shares.length}</span>
 						</Button>
 					</div>
 
