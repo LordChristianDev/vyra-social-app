@@ -54,7 +54,8 @@ app.use(apiRouter.allowedMethods());
 
 // Serve static React files
 const clientPath = path.join(__dirname, '../../client/dist');
-console.log('📁 Serving client from:', clientPath);
+console.log('👉 Serving client from:', clientPath);
+
 app.use(serve(clientPath));
 
 // SPA fallback - serve index.html for all non-API routes
@@ -73,7 +74,7 @@ app.use(async (ctx) => {
   try {
     await send(ctx, 'index.html', { root: clientPath });
   } catch (err) {
-    console.error('❌ Error serving index.html:', err);
+    console.error('Error serving index.html:', err);
     ctx.status = 404;
     ctx.body = 'Not found';
   }
@@ -83,7 +84,6 @@ app.use(async (ctx) => {
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📡 API available at http://localhost:${PORT}/api`);
-  console.log(`🌐 Client available at http://localhost:${PORT}`);
+  console.log(`👉 Server running on http://localhost:${PORT}`);
+  console.log(`👉 API available at http://localhost:${PORT}/api`);
 });
