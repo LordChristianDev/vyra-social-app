@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Bookmark, Edit, Heart, MessageCircle, MoreHorizontal, Share, Trash2 } from "lucide-react";
 
 import { useAuth } from "@/context/use-auth";
@@ -27,15 +28,19 @@ import { DeletePostDialog } from "@/features/dashboard/components/posts/delete-p
 import { CommentsSection } from "@/features/dashboard/components/comments/comments-section";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
+import {
+	CONTROLLER as POST_CONTROLLER
+} from "@/features/dashboard/services/post-services";
 
 export const PostCard = ({ post }: { post: PostProp }) => {
+	const queryClient = useQueryClient();
 	const { currentUser } = useAuth();
 	const [showComments, setShowComments] = useState<boolean>(false);
 	const [isEditPostDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
 	const [isDeletePostDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
 	const {
-		author_id, created_at, content, images, youtube_embed, tags, comments, all_likes, all_saved, all_shares,
+		id, author_id, created_at, content, images, youtube_embed, tags, comments, all_likes, all_saved, all_shares,
 		author: { first_name, last_name, username, avatar_url, privacy_settings }
 	} = post as PostProp;
 
@@ -52,23 +57,74 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 	// Booleans
 	const isOwnPost: boolean = currentUser?.id == author_id;
 
-	const handleLikes = () => {
+	const handleLikes = async () => {
 		setIsLiked(!isLiked)
-		setLikes(isLiked ? likes.filter(id =>
+
+		const values: Object = {};
+		const set: number[] = isLiked ? likes.filter(id =>
 			id !== currentUser?.id
 		) : [
 			...likes, currentUser?.id ?? 0
-		]);
+		];
+
+		setLikes(set);
+
+		await POST_CONTROLLER.EditPostWithId(
+			id,
+			{
+				...values,
+				all_likes: set,
+			},
+		);
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
 	};
-	const handleShares = () => {
+	const handleShares = async () => {
 		setIsShared(!isShared);
-		setShares(isShared ? shares.filter(id =>
+
+		const values: Object = {};
+		const set: number[] = isShared ? shares.filter(id =>
 			id !== currentUser?.id
 		) : [
 			...shares, currentUser?.id ?? 0
-		]);
+		];
+
+		setShares(set);
+
+		await POST_CONTROLLER.EditPostWithId(
+			id,
+			{
+				...values,
+				all_shares: set,
+			},
+		);
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
 	};
-	const handleSaves = () => setIsSaved(!isSaved);
+
+	const handleSaves = async () => {
+		setIsSaved(!isSaved)
+
+		const values: Object = {};
+		const set: number[] = isSaved ? all_saved.filter(id =>
+			id !== currentUser?.id
+		) : [
+			...all_saved, currentUser?.id ?? 0
+		];
+
+		await POST_CONTROLLER.EditPostWithId(
+			id,
+			{
+				...values,
+				all_saved: set,
+			},
+		);
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
+	};
 
 	const renderTags = (tags ?? []).map(tags => (
 		<Badge key={tags.id} className="space-x-4 px-1.5 py-0.5 text-xs text-white bg-gradient-primary">
@@ -228,7 +284,10 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 			{showComments && (
 				<>
 					<Separator />
-					<CommentsSection comments={comments ?? []} />
+					<CommentsSection
+						post={post as PostProp}
+						comments={comments ?? []}
+					/>
 				</>
 			)}
 
