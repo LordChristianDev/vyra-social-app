@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Card, CardContent } from "@/components/ui/card";
 
-import { QUERIES } from "@/features/dashboard/services/post-services";
+import {
+	CONTROLLER as POST_CONTROLLER
+} from "@/features/dashboard/services/post-services";
 
 export const ExploreCategories = () => {
 	const { data: categoriesData, isFetching: categoriesFetching } = useQuery({
-		queryKey: ["suggested-categories"],
-		queryFn: () => QUERIES.fetchCategories(),
+		queryKey: ["explore-categories"],
+		queryFn: () => POST_CONTROLLER.FetchTrendingCategories(),
 		enabled: (query) => !query.state.data,
 		refetchOnMount: true,
 		staleTime: 0,
