@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { showToast } from "@/lib/show-toast";
-import { createFullName, getInitials } from "@/lib/formatters";
+import { createFullName, extractYouTubeId, getInitials, removeYouTubeLinks } from "@/lib/formatters";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,9 @@ import {
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
+import {
+	CONTROLLER as POST_CONTROLLER
+} from "@/features/dashboard/services/post-services";
 
 type EditPostDialogProp = {
 	open: boolean;
@@ -31,26 +35,67 @@ export const EditPostDialog = ({ open, onOpenChange, post }: EditPostDialogProp)
 
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [postContent, setPostContent] = useState<string>(content);
+	const queryClient = useQueryClient();
 
 	const maxChars: number = 250;
 	const fullName: string = createFullName(first_name, last_name);
 
 	// Update
 	const handleEdit = async () => {
+		if (!postContent.trim() && postContent.length === 0) {
+			showToast({
+				title: "Empty post",
+				description: "Please add some content to your post.",
+				variant: "warning",
+			});
+			return;
+		}
 		setIsLoading(true);
 
-		setTimeout(() => {
+		let values: Object = {};
+
+		// Check if Youtube URL Exist
+		const youtubeId = extractYouTubeId(postContent);
+
+		if (youtubeId) {
+			values = {
+				...values,
+				youtube_embed: youtubeId,
+			}
+		}
+
+		const response = await POST_CONTROLLER.EditPostWithId(
+			post.id,
+			{
+				...values,
+				content: removeYouTubeLinks(postContent).trim()
+			},
+		);
+
+		if (!response) {
+			showToast({
+				title: "Creation Failed!",
+				description: "Failed to create post.",
+				variant: "error"
+			});
 			setIsLoading(false);
 			onOpenChange(false);
 			setPostContent("");
+			return;
+		}
 
-			showToast({
-				title: "Successfully Updated Post",
-				description: "Your post has been updated!",
-				variant: "success"
-			});
+		showToast({
+			title: "Post Updated Successfully!",
+			description: "Your post has been updated.",
+			variant: "success"
+		});
 
-		}, 3000);
+		setIsLoading(false);
+		onOpenChange(false);
+		setPostContent("");
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	};
 
 	return (

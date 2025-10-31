@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { showToast } from "@/lib/show-toast";
 
 import {
 	AlertDialog,
@@ -12,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
+import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
 
 export type DeletePostDialogProp = {
 	open: boolean;
@@ -22,17 +26,39 @@ export type DeletePostDialogProp = {
 export const DeletePostDialog = ({
 	open,
 	onOpenChange,
-	// post
+	post
 }: DeletePostDialogProp) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const queryClient = useQueryClient();
 
 	const handleDelete = async () => {
+		if (!post.id) throw new Error("No Unique Identifier!");
 		setIsLoading(true);
 
-		setTimeout(() => {
+		const response = await POST_CONTROLLER.DeletePostWithId(post.id)
+
+		if (!response) {
+			showToast({
+				title: "Deletion Failed!",
+				description: "Failed to delete post.",
+				variant: "error"
+			});
 			setIsLoading(false);
 			onOpenChange(false);
-		}, 3000);
+			return;
+		}
+
+		showToast({
+			title: "Post Deleted Successfully!",
+			description: "Your post has been deleted.",
+			variant: "success"
+		});
+
+		setIsLoading(false);
+		onOpenChange(false);
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	}
 
 	return (
