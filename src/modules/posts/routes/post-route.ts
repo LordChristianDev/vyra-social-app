@@ -3,7 +3,9 @@ import Router from '@koa/router';
 
 import {
 	InsertPost,
+	SelectCategory,
 	SelectPost,
+	SelectTag,
 } from "@/db/schema";
 import {
 	QUERIES,
@@ -171,6 +173,28 @@ router.get('/fetch-tags', async (ctx) => {
 	};
 });
 
+router.get('/fetch-tag-with-id/:id', async (ctx) => {
+	const id: SelectTag["id"] = Number(ctx.params.id);
+
+	const [data, error] = await QUERIES.fetchTagWithId(id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch tag',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
 router.get('/fetch-trending-tags', async (ctx) => {
 	const [data, error] = await QUERIES.fetchTrendingTags();
 
@@ -190,6 +214,29 @@ router.get('/fetch-trending-tags', async (ctx) => {
 		data,
 	};
 });
+
+router.get('/fetch-category-with-id/:id', async (ctx) => {
+	const id: SelectCategory["id"] = Number(ctx.params.id);
+
+	const [data, error] = await QUERIES.fetchCategoryById(id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch fetch',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
 
 router.get('/fetch-trending-categories', async (ctx) => {
 	const [data, error] = await QUERIES.fetchTrendingCategories();

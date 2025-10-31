@@ -7,7 +7,9 @@ import {
 	InsertPost,
 	SelectPost,
 	postsTable as POSTS_TABLE,
+	SelectTag,
 	tagsTable as TAGS_TABLE,
+	SelectCategory,
 	categoriesTable as CATEGORIES_TABLE,
 } from "@/db/schema";
 
@@ -78,10 +80,21 @@ export const QUERIES = {
 				.from(TAGS_TABLE)
 				.leftJoin(
 					POSTS_TABLE,
-					arrayContains(POSTS_TABLE.all_tags, TAGS_TABLE.id)
+					sql`${POSTS_TABLE.all_tags} @> ARRAY[${TAGS_TABLE.id}]::integer[]`
 				)
 				.groupBy(TAGS_TABLE.id)
 				.orderBy(desc(sql`count(${POSTS_TABLE.id})`));
+
+			return result;
+		});
+	},
+	fetchTagWithId: async function (id: SelectTag["id"]) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(TAGS_TABLE)
+				.where(eq(TAGS_TABLE.id, id))
+				.limit(1);
 
 			return result;
 		});
@@ -99,11 +112,22 @@ export const QUERIES = {
 				.from(TAGS_TABLE)
 				.leftJoin(
 					POSTS_TABLE,
-					arrayContains(POSTS_TABLE.all_tags, TAGS_TABLE.id)
+					sql`${POSTS_TABLE.all_tags} @> ARRAY[${TAGS_TABLE.id}]::integer[]`
 				)
 				.groupBy(TAGS_TABLE.id)
 				.orderBy(desc(sql`count(${POSTS_TABLE.id})`))
 				.limit(5);
+
+			return result;
+		});
+	},
+	fetchCategoryById: async function (id: SelectCategory["id"]) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(CATEGORIES_TABLE)
+				.where(eq(CATEGORIES_TABLE.id, id))
+				.limit(1);
 
 			return result;
 		});
