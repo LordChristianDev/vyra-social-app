@@ -2,6 +2,9 @@ import { BASE_URL } from "@/main";
 import { tryCatch, type Result } from "@/lib/try-catch";
 
 import type { CommentProp } from "@/features/dashboard/types/dashboard-types";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 /**
  * Controller
@@ -46,7 +49,19 @@ export const CONTROLLER = {
 		if (error) throw new Error('Error fetching comments:', error);
 		if (!comments) return [];
 
-		return comments;
+		const result: CommentProp[] = await Promise.all(
+			comments.map(async (comment) => {
+				const { author_id } = comment;
+				let setPost: CommentProp = comment;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				return setPost;
+			})
+		);
+
+		return result;
 	},
 	/**
 	 * Fetches some comments with the given post ID
@@ -67,7 +82,19 @@ export const CONTROLLER = {
 		if (error) throw new Error('Error fetching comments:', error);
 		if (!comments) return [];
 
-		return comments;
+		const result: CommentProp[] = await Promise.all(
+			comments.map(async (comment) => {
+				const { author_id } = comment;
+				let setPost: CommentProp = comment;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				return setPost;
+			})
+		);
+
+		return result;
 	},
 	/**
 	 * Updates a comment with the given ID
