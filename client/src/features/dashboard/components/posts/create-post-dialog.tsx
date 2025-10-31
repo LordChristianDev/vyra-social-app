@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Image, Upload, X } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import { showToast } from "@/lib/show-toast";
-import { createFullName, getInitials } from "@/lib/formatters";
+import { createFullName, extractYouTubeId, getInitials, removeYouTubeLinks } from "@/lib/formatters";
 
 import {
 	Dialog,
@@ -19,6 +20,9 @@ import { Separator } from "@/components/ui/separator";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
 import type { MediaProp, ProfileProp } from "@/features/personalization/types/profile-types";
+import {
+	CONTROLLER as POST_CONTROLLER
+} from "@/features/dashboard/services/post-services";
 
 type CreatePostDialogProp = {
 	profile: ProfileProp;
@@ -28,11 +32,12 @@ type CreatePostDialogProp = {
 export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+	const queryClient = useQueryClient();
 
 	const [content, setContent] = useState<string>('');
 	const [uploads, setUploads] = useState<MediaProp[]>([]);
 
-	const { first_name, last_name, avatar_url } = profile;
+	const { user_id, first_name, last_name, avatar_url } = profile;
 	const fullName = createFullName(first_name, last_name);
 
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -144,20 +149,58 @@ export const CreatePostDialog = ({ profile, children }: CreatePostDialogProp) =>
 		}
 		setIsLoading(true);
 
-		setTimeout(() => {
-			setIsLoading(false);
-			setIsDialogOpen(false)
+		let values: Object = {};
 
+		// Check if Youtube URL Exist
+		const youtubeId = extractYouTubeId(content);
+
+		if (youtubeId) {
+			values = {
+				...values,
+				youtube_embed: youtubeId,
+			}
+		}
+
+		// Check if Images Exist
+		if (uploads.length > 0) {
+			const urls = await POST_CONTROLLER.UploadPostImages(user_id, uploads);
+			values = {
+				...values,
+				images: urls,
+			}
+		}
+
+		const response = await POST_CONTROLLER.CreateNewPost(
+			user_id,
+			removeYouTubeLinks(content).trim(),
+			values
+		);
+
+		if (!response) {
 			showToast({
-				title: "Empty post",
-				description: "Please add some content to your post.",
-				variant: "warning",
+				title: "Creation Failed!",
+				description: "Failed to create post.",
+				variant: "error"
 			});
-
-			// Reset Values
+			setIsLoading(false);
+			setIsDialogOpen(false);
 			setUploads([]);
 			setContent("");
-		}, 3000);
+			return;
+		}
+
+		showToast({
+			title: "Post Created Successfully!",
+			description: "Your post has been created.",
+			variant: "success"
+		});
+		setIsLoading(false);
+		setIsDialogOpen(false);
+		setUploads([]);
+		setContent("");
+
+		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
+		queryClient.invalidateQueries({ queryKey: ["settings-profile"] });
 	};
 
 	return (
