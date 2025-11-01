@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 
 import { useNotifications } from "@/features/personalization/hooks/useNotifications";
@@ -21,8 +22,12 @@ import { Badge } from "@/components/ui/badge";
 import { AvatarIcon } from "@/components/common/avatar-icon";
 
 import type { NotificationProp } from "@/features/personalization/types/notification-types";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/notification-services";
 
 export const NotificationsOverview = ({ all_notifications }: { all_notifications: NotificationProp[] }) => {
+	const queryClient = useQueryClient();
 	const [activeTab, setActiveTab] = useState<string>("all");
 	const [notifications, setNotifications] = useState<NotificationProp[]>(all_notifications);
 	const { unread } = useNotifications();
@@ -42,10 +47,17 @@ export const NotificationsOverview = ({ all_notifications }: { all_notifications
 		onUpdate();
 	}, [activeTab, all_notifications]);
 
-	const markAsRead = (id: number) => {
+	const markAsRead = async (id: number) => {
 		setNotifications(prev => prev.map(notif =>
 			notif.id === id ? { ...notif, is_read: true } : notif
 		));
+
+		const status = await PROFILE_CONTROLLER.UpdateNotification(id);
+
+		if (status) {
+			queryClient.invalidateQueries({ queryKey: ["notification-popover-notifications"] });
+		}
+
 	};
 
 	const renderNotifications = notifications.map((n: NotificationProp) => {
