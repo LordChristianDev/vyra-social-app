@@ -84,7 +84,7 @@ export const CommentCard = ({ comment }: { comment: CommentProp }) => {
 							<div className="flex items-center gap-2 mb-1">
 								<span className="font-medium text-sm">{fullName}</span>
 								{is_verified && (
-									<Badge className="bg-gradient-primary text-primary-foreground px-1 py-0 text-xs">
+									<Badge className="bg-gradient-primary text-gray-200 px-1 py-0 text-xs">
 										✓
 									</Badge>
 								)}
