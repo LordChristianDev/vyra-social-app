@@ -27,7 +27,8 @@
     "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "koa-send": "^5.0.1",
-    "koa-static": "^5.0.0"
+    "koa-static": "^5.0.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@types/koa": "^3.0.0",
@@ -37,6 +38,7 @@
     "@types/koa-send": "^4.1.6",
     "@types/koa-static": "^4.0.4",
     "@types/node": "^24.7.0",
+    "@types/ws": "^8.18.1",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.5",
     "nodemon": "^3.1.10",
