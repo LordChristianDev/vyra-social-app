@@ -15,6 +15,9 @@ import type { CommentProp, PostProp } from "@/features/dashboard/types/dashboard
 import {
 	CONTROLLER as COMMENT_CONTROLLER
 } from "@/features/dashboard/services/comment-services";
+import {
+	CONTROLLER as NOTIFICATION_CONTROLLER
+} from "@/features/personalization/services/notification-services";
 
 type CommentSectionProp = {
 	post: PostProp
@@ -82,6 +85,19 @@ export const CommentsSection = ({ post, comments }: CommentSectionProp) => {
 
 		setIsLoading(false);
 		setNewComment("");
+
+		if (post.author.notif_settings.notify_comments && (profile.user_id !== post.author_id)) {
+			const result = await NOTIFICATION_CONTROLLER.CreateNewNotification(
+				profile.user_id,
+				post.author_id,
+				`commented on your post`,
+				"comment"
+			)
+
+			if (result) {
+				queryClient.invalidateQueries({ queryKey: ["notification-popover-notifications"] });
+			}
+		}
 	};
 
 	const renderAllComments = visibleComments.map((comment, index) => {
