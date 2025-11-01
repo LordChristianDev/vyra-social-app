@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/context/use-auth";
+
 import { NotificationsOverview } from "@/features/personalization/components/notifications/notifications-overview";
 
-import { QUERIES } from "@/features/personalization/services/notification-services";
+import { CONTROLLER as NOTIFICATION_CONTROLLER } from "@/features/personalization/services/notification-services";
 
 export default function NotificationsPage() {
 	return (
@@ -11,11 +13,13 @@ export default function NotificationsPage() {
 };
 
 const NotificationsContent = () => {
+	const { currentUser } = useAuth();
+
 	const { data: notificationsData, isFetching: notificationsFetching } = useQuery({
-		queryKey: ["appbar-notifications"],
-		queryFn: async () => QUERIES.fetchNotifications(),
+		queryKey: ["notifications-notifications"],
+		queryFn: async () => NOTIFICATION_CONTROLLER.FetchAllNotificationsWithUserId(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
-		enabled: true,
 		staleTime: 0,
 	});
 
