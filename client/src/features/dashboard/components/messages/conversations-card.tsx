@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { Search, Send } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useChat } from "../../hooks/use-chat";
 import { createFullName, getInitials, timeAgo } from "@/lib/formatters";
 
 import {
@@ -19,7 +20,6 @@ import { StartConversationDialog } from "@/features/dashboard/components/message
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import type { ConversationProp, MessageProp } from "@/features/dashboard/types/message_types";
-import { useChat } from "../../hooks/use-chat";
 
 type ConversationsCardProp = {
 	profile: ProfileProp;
@@ -60,12 +60,11 @@ export const ConversationsCard = ({
 	}, [conversations, search]);
 
 	// Render Conversations
-	const renderConversations = convos.map((convo) => {
+	const renderConversations = (convos ?? []).map((convo) => {
 		const { id, created_at, updated_at, participants, messages } = convo;
-		const { profile: convoProfile } = participants.find((p) => Number(p.profile.id) !== profile.id)!;
-		const { first_name, last_name, avatar_url } = convoProfile;
+		const { profile: convoProfile } = (participants ?? []).find((p) => Number(p.profile.id) !== profile.id)!;
 
-		const fullName = createFullName(first_name, last_name);
+		const { first_name, last_name, avatar_url } = convoProfile as ProfileProp;
 
 		const lastMessage = messages && messages.length > 0
 			? messages[messages.length - 1].content
@@ -90,7 +89,7 @@ export const ConversationsCard = ({
 				<div className="relative shrink-0">
 					<AvatarIcon
 						src={avatar_url ?? ""}
-						fallback={getInitials(fullName)}
+						fallback={getInitials(createFullName(first_name, last_name))}
 						className="ring-2 ring-primary/20 group-hover:ring-primary/40 transition-smooth"
 						size="lg"
 					/>
@@ -99,7 +98,7 @@ export const ConversationsCard = ({
 				<div className="flex-1 min-w-0 overflow-hidden">
 					<div className="flex items-center justify-between mb-1 gap-2 w-full h-full">
 						<p className="font-semibold text-foreground group-hover:text-primary transition-smooth flex-1 min-w-0 truncate">
-							{fullName}
+							{createFullName(first_name, last_name)}
 						</p>
 
 						<span className="text-xs text-muted-foreground font-medium whitespace-nowrap">
@@ -113,7 +112,7 @@ export const ConversationsCard = ({
 				</div>
 
 				{numOfUnread > 0 && (
-					<Badge className="bg-gradient-primary text-primary-foreground shadow-sm min-w-6 h-6 flex items-center justify-center shrink-0">
+					<Badge className="bg-gradient-primary text-gray-200 shadow-sm min-w-6 h-6 flex items-center justify-center shrink-0">
 						{numOfUnread}
 					</Badge>
 				)}
@@ -126,8 +125,8 @@ export const ConversationsCard = ({
 			<CardHeader className="from-primary/5 to-secondary/5 border-b">
 				<div className="mb-2 flex items-center justify-between">
 					<CardTitle className="flex items-center gap-3">
-						<div className="p-2 bg-gradient-primary rounded-lg">
-							<Send className="h-4 w-4 text-grey-200" />
+						<div className="p-2 bg-gradient-primary text-gray-200 rounded-lg">
+							<Send className="h-4 w-4" />
 						</div>
 						Conversations
 					</CardTitle>
