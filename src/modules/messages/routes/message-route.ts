@@ -14,6 +14,10 @@ import {
 	MUTATIONS,
 } from '@/modules/messages/server/message-server';
 
+import { QUERIES as PROFILE_QUERIES } from '@/modules/profiles/server/profile-server';
+
+import { wsServer } from '../server/websocket-server';
+
 const router = new Router();
 
 // Route Check
@@ -93,6 +97,25 @@ router.post('/create-message', async (ctx: Context) => {
 		return;
 	}
 
+	// Fetch all messages for the conversation
+	const [messages, fetchError] = await QUERIES.fetchMessagesByConversationId(conversation_id);
+
+	if (!fetchError && messages) {
+		const result = await Promise.all(
+			messages.map(async (message) => {
+				let setMessage: Object = message;
+
+				const [sender, senderError] = await PROFILE_QUERIES.fetchProfileWithId(message.sender_id);
+				if (!senderError && sender) setMessage = { ...setMessage, sender: sender[0] };
+
+				return setMessage;
+			})
+		);
+
+		// Broadcast to all clients in this conversation
+		wsServer.broadcastToConversation(conversation_id, result);
+	}
+
 	ctx.status = 200;
 	ctx.body = {
 		status: true,
@@ -104,10 +127,10 @@ router.post('/create-message', async (ctx: Context) => {
  * Retrieve
  */
 
-router.get("fetch-converations-profile-id/:profile_id", async (ctx) => {
+router.get("/fetch-all-converations-profile-id/:profile_id", async (ctx) => {
 	const profile_id: SelectParticipant["profile_id"] = Number(ctx.params.profile_id);
 
-	const [data, error] = await QUERIES.fetchConversationsByProfileId(profile_id);
+	const [data, error] = await QUERIES.fetchAllConversationsByProfileId(profile_id);
 
 	if (error) {
 		ctx.status = 500;
@@ -126,7 +149,35 @@ router.get("fetch-converations-profile-id/:profile_id", async (ctx) => {
 	};
 });
 
-router.get("fetch-converation/:id", async (ctx) => {
+router.post("/fetch-some-converations-profile-id/:profile_id", async (ctx) => {
+	const profile_id: SelectParticipant["profile_id"] = Number(ctx.params.profile_id);
+	const request_body = ctx.request.body as { page: number, pageSize: number };
+	const { page, pageSize } = request_body;
+
+	const [data, error] = await QUERIES.fetchSomeConversationsByProfileId(
+		profile_id,
+		page,
+		pageSize,
+	);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: "Failed to fetch conversations",
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.get("/fetch-converation/:id", async (ctx) => {
 	const id: SelectConversation["id"] = Number(ctx.params.id);
 
 	const [data, error] = await QUERIES.fetchConversationById(id);
@@ -148,7 +199,53 @@ router.get("fetch-converation/:id", async (ctx) => {
 	};
 });
 
-router.get("fetch-participants-conversation-id/:conversation_id", async (ctx) => {
+router.get("/fetch-most-recent-conversation", async (ctx) => {
+	const [data, error] = await QUERIES.fetchMostRecentConversation();
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: "Failed to fetch conversation",
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.post("/fetch-converation-with-profile-and-user-id", async (ctx) => {
+	const request_body = ctx.request.body as {
+		profile_id: SelectParticipant["profile_id"];
+		user_id: SelectParticipant["profile_id"];
+	};
+	const { profile_id, user_id } = request_body;
+
+	const [data, error] = await QUERIES.fetchConversationBetweenProfiles(profile_id, user_id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: "Failed to fetch conversation",
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.get("/fetch-participants-conversation-id/:conversation_id", async (ctx) => {
 	const conversation_id: SelectParticipant["conversation_id"] = Number(ctx.params.conversation_id);
 
 	const [data, error] = await QUERIES.fetchParticipantsByConversationId(conversation_id);
@@ -170,7 +267,7 @@ router.get("fetch-participants-conversation-id/:conversation_id", async (ctx) =>
 	};
 });
 
-router.get("fetch-participants-profile-id/:profile_id", async (ctx) => {
+router.get("/fetch-participants-profile-id/:profile_id", async (ctx) => {
 	const profile_id: SelectParticipant["profile_id"] = Number(ctx.params.profile_id);
 
 	const [data, error] = await QUERIES.fetchParticipantsByProfileId(profile_id);
@@ -192,7 +289,7 @@ router.get("fetch-participants-profile-id/:profile_id", async (ctx) => {
 	};
 });
 
-router.get("fetch-messages/:conversation_id", async (ctx) => {
+router.get("/fetch-messages/:conversation_id", async (ctx) => {
 	const conversation_id: SelectMessage["conversation_id"] = Number(ctx.params.conversation_id);
 
 	const [data, error] = await QUERIES.fetchMessagesByConversationId(conversation_id);
@@ -202,6 +299,28 @@ router.get("fetch-messages/:conversation_id", async (ctx) => {
 		ctx.body = {
 			status: false,
 			error: "Failed to fetch messages",
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.get("/fetch-profiles-without-conversation/:user_id", async (ctx) => {
+	const user_id: SelectParticipant["profile_id"] = Number(ctx.params.user_id);
+
+	const [data, error] = await QUERIES.fetchProfilesWithoutConversationWithUserId(user_id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: "Failed to fetch profiles",
 			message: error.message,
 		};
 		return;
