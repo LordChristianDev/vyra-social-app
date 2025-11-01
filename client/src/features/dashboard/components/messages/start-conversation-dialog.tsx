@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
 import { useAuth } from "@/context/use-auth";
@@ -21,8 +21,8 @@ import { LoadingHud } from "@/components/common/loading-hud";
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
 import {
-	CONTROLLER as PROFILE_CONTROLLER
-} from "@/features/personalization/services/profile-services";
+	CONTROLLER as MESSAGE_CONTROLLER
+} from "@/features/dashboard/services/message-services";
 
 type StartConversationDialogProp = {
 	open: boolean;
@@ -33,6 +33,7 @@ export const StartConversationDialog = ({
 	open,
 	onOpenChange,
 }: StartConversationDialogProp) => {
+	const queryClient = useQueryClient();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [search, setSearch] = useState<string>("")
 	const [profiles, setProfiles] = useState<ProfileProp[]>([]);
@@ -42,7 +43,7 @@ export const StartConversationDialog = ({
 
 	const { data: profilesData, isFetching: profilesFetching } = useQuery({
 		queryKey: ["start-conversation-profiles", currentUser?.id],
-		queryFn: () => PROFILE_CONTROLLER.FetchAllSuggestedProfiles(currentUser?.id ?? 0),
+		queryFn: () => MESSAGE_CONTROLLER.FetchStartConvoProfiles(currentUser?.id ?? 0),
 		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
@@ -59,10 +60,6 @@ export const StartConversationDialog = ({
 	}, [profilesData, profilesFetching]);
 
 	useEffect(() => {
-		setProfiles([]);
-	}, [open]);
-
-	useEffect(() => {
 		if (search.trim() == "") {
 			if (profilesData) {
 				setProfiles(profilesData);
@@ -75,34 +72,51 @@ export const StartConversationDialog = ({
 	}, [profilesData, search]);
 
 	const renderProfiles = profiles.map((profile) => {
-		const { id, first_name, last_name, username, avatar_url } = profile;
+		const { first_name, last_name, username, avatar_url, user_id } = profile;
 
 		const fullName = createFullName(first_name, last_name);
 
-		const handleCreateNewConvo = (profile_id: number) => {
-			if (!profile_id) throw new Error("No Unique Identifer Found");
+		const handleCreateNewConvo = async () => {
+			if (!user_id) throw new Error("No Unique Identifer Found");
+			if (!currentUser?.id) throw new Error("No Unique Identifer Found");
+
 			setIsLoading(true);
 
-			setTimeout(() => {
+			const response = await MESSAGE_CONTROLLER.CreateNewConversation(user_id, currentUser.id);
+
+			if (!response) {
+				showToast({
+					title: "Creation Failed",
+					description: "Failed to create new conversation",
+					variant: "error"
+				});
+
 				setIsLoading(false);
 				onOpenChange(false);
+				return;
+			}
 
-				showToast({
-					title: "Conversation Created",
-					description: "You have successfully created a new conversation",
-					variant: "success"
-				});
-			}, 3000);
+			queryClient.invalidateQueries({ queryKey: ["messages-conversations"] });
+			queryClient.invalidateQueries({ queryKey: ["start-conversation-profiles"] });
+
+			showToast({
+				title: "Conversation Created",
+				description: "You have successfully created a new conversation",
+				variant: "success"
+			});
+
+			setIsLoading(false);
+			onOpenChange(false);
 		}
 
 		return (
 			<div
-				key={first_name + last_name + id}
+				key={first_name + last_name + user_id}
 				className={cn(
 					"mx-auto p-4 group flex flex-row items-center gap-4 rounded-xl cursor-pointer transition-smooth border-2 overflow-hidden",
 					"hover:bg-accent/30 border-transparent hover:border-accent/50"
 				)}
-				onClick={() => handleCreateNewConvo(id)}
+				onClick={() => handleCreateNewConvo()}
 			>
 				<div className="relative shrink-0">
 					<AvatarIcon
@@ -155,7 +169,14 @@ export const StartConversationDialog = ({
 							/>
 						</div>
 						<div className="space-y-2">
-							{renderProfiles}
+							{profiles && profiles.length > 0 ? (
+								(renderProfiles)
+							) : (
+								<div className="mx-auto my-auto py-4 flex flex-col justify-center items-center h-full">
+									<h2 className="text-2xl font-semibold ">Start Chatting</h2>
+									<p className="text-sm text-muted-foreground">Create a fun conversation</p>
+								</div>
+							)}
 						</div>
 					</div>
 				)}
