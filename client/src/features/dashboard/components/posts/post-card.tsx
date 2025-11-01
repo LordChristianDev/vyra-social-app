@@ -31,6 +31,9 @@ import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import {
 	CONTROLLER as POST_CONTROLLER
 } from "@/features/dashboard/services/post-services";
+import {
+	CONTROLLER as NOTIFICATION_CONTROLLER
+} from "@/features/personalization/services/notification-services";
 
 export const PostCard = ({ post }: { post: PostProp }) => {
 	const queryClient = useQueryClient();
@@ -41,7 +44,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 
 	const {
 		id, author_id, created_at, content, images, youtube_embed, tags, comments, all_likes, all_saved, all_shares,
-		author: { first_name, last_name, username, avatar_url, privacy_settings }
+		author: { first_name, last_name, username, avatar_url, privacy_settings, notif_settings }
 	} = post as PostProp;
 
 	const [isLiked, setIsLiked] = useState<boolean>(all_likes.includes(currentUser?.id ?? 0));
@@ -58,7 +61,8 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 	const isOwnPost: boolean = currentUser?.id == author_id;
 
 	const handleLikes = async () => {
-		setIsLiked(!isLiked)
+		const status = !isLiked;
+		setIsLiked(status)
 
 		const values: Object = {};
 		const set: number[] = isLiked ? likes.filter(id =>
@@ -77,11 +81,26 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 			},
 		);
 
+		if (status && notif_settings.notify_likes && (currentUser?.id !== author_id)) {
+			const result = await NOTIFICATION_CONTROLLER.CreateNewNotification(
+				currentUser?.id ?? 0,
+				author_id,
+				`liked your post`,
+				"like"
+			)
+
+			if (result) {
+				queryClient.invalidateQueries({ queryKey: ["notification-popover-notifications"] });
+			}
+
+		}
+
 		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
 		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
 	};
 	const handleShares = async () => {
-		setIsShared(!isShared);
+		const status = !isShared;
+		setIsShared(status);
 
 		const values: Object = {};
 		const set: number[] = isShared ? shares.filter(id =>
@@ -99,6 +118,19 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 				all_shares: set,
 			},
 		);
+
+		if (status && notif_settings.notify_likes && (currentUser?.id !== author_id)) {
+			const result = await NOTIFICATION_CONTROLLER.CreateNewNotification(
+				currentUser?.id ?? 0,
+				author_id,
+				`shared your post`,
+				"share"
+			)
+
+			if (result) {
+				queryClient.invalidateQueries({ queryKey: ["notification-popover-notifications"] });
+			}
+		}
 
 		queryClient.invalidateQueries({ queryKey: ["home-posts"] });
 		queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
