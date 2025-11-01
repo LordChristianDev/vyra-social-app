@@ -1,4 +1,4 @@
-import { eq, desc, sql, arrayContains } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 import { db } from "@config/db";
 import { queryDB } from "@/utils/try-catch";
@@ -148,11 +148,11 @@ export const QUERIES = {
 				)
 				.leftJoin(
 					POSTS_TABLE,
-					arrayContains(POSTS_TABLE.all_tags, TAGS_TABLE.id)
+					sql`${POSTS_TABLE.all_tags} @> ARRAY[${TAGS_TABLE.id}]::integer[]`
 				)
 				.groupBy(CATEGORIES_TABLE.id)
 				.orderBy(desc(sql`count(distinct ${POSTS_TABLE.id})`))
-				.limit(5);
+				.limit(4);
 
 			return result;
 		});
