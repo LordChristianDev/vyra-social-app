@@ -90,7 +90,8 @@ export function MultiSelectComboBox({
 		return (
 			<CommandItem
 				key={name}
-				value={name}
+				value={label}
+				keywords={[name]}
 				onSelect={() => handleOnSelect(name)}
 			>
 				<Check
