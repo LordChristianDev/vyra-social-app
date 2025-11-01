@@ -41,9 +41,15 @@ export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOvervie
 					</TabsList>
 
 					<TabsContent value="posts">
-						<div className="space-y-6">
-							<DisplayPosts posts={posts ?? []} />
-						</div>
+						{posts && posts.length > 0 ? (
+							<div className="space-y-6">
+								<DisplayPosts posts={posts ?? []} />
+							</div>
+						) : (
+							<div className="text-center py-12">
+								<p className="text-muted-foreground">No personal posts to show</p>
+							</div>
+						)}
 					</TabsContent>
 
 					<TabsContent value="media">
@@ -54,7 +60,7 @@ export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOvervie
 
 					<TabsContent value="saved">
 						<div className="text-center py-12">
-							<p className="text-muted-foreground">No savedposts to show</p>
+							<p className="text-muted-foreground">No saved posts to show</p>
 						</div>
 					</TabsContent>
 				</Tabs>
