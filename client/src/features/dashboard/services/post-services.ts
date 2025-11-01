@@ -581,7 +581,7 @@ export const QUERIES = {
 	fetchTrendingCategories: async function (): Promise<Result<CategoryProp[]>> {
 		return tryCatch(
 			(async () => {
-				const response = await fetch(BASE_URL + `/post/fetch-trending-tags`, {
+				const response = await fetch(BASE_URL + `/post/fetch-trending-categories`, {
 					method: "GET",
 				});
 
