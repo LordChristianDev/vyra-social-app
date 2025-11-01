@@ -1,4 +1,5 @@
 import Koa from 'koa';
+import http from 'http';
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import bodyParser from 'koa-bodyparser';
@@ -19,6 +20,8 @@ import commentRoutes from '@/modules/posts/routes/comment-route';
 import notificationRoutes from '@/modules/profiles/routes/notification-route';
 import profileRoutes from '@/modules/profiles/routes/profile-route';
 import settingRoutes from '@/modules/profiles/routes/setting-route';
+
+import { wsServer } from '@/modules/messages/server/websocket-server';
 
 const app = new Koa();
 
@@ -58,6 +61,12 @@ console.log('👉 Serving client from:', clientPath);
 
 app.use(serve(clientPath));
 
+// Create HTTP server
+const server = http.createServer(app.callback());
+
+// Initialize WebSocket server
+wsServer.initialize(server);
+
 // SPA fallback - serve index.html for all non-API routes
 app.use(async (ctx) => {
   // Skip if it's an API route
@@ -83,7 +92,9 @@ app.use(async (ctx) => {
 // Start server
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
+// CHANGE THIS: Use server.listen() instead of app.listen()
+server.listen(PORT, () => {
   console.log(`👉 Server running on http://localhost:${PORT}`);
   console.log(`👉 API available at http://localhost:${PORT}/api`);
+  console.log(`📡 WebSocket server running on ws://localhost:${PORT}`);
 });
