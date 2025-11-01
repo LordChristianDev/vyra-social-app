@@ -147,7 +147,7 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 							<div className="flex items-center gap-2">
 								<h4 className="font-semibold">{fullName}</h4>
 								{privacy_settings && privacy_settings.is_verified && (
-									<Badge className="px-1.5 py-0.5 text-xs text-primary-foreground bg-gradient-primary">
+									<Badge className="px-1.5 py-0.5 text-xs text-gray-200 bg-gradient-primary">
 										✓
 									</Badge>
 								)}
