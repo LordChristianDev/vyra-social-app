@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 
+import { useAuth } from "@/context/use-auth";
 import { useRoutes } from "@/hooks/use-routes";
 import { useNotifications } from "@/features/personalization/hooks/useNotifications";
 import { getNotificationIcon } from "@/lib/helpers";
@@ -15,9 +16,12 @@ import { AvatarIcon } from "@/components/common/avatar-icon";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import type { NotificationProp } from "@/features/personalization/types/notification-types";
-import { QUERIES } from "@/features/personalization/services/notification-services";
+import {
+	CONTROLLER as NOTIFICATION_CONTROLLER
+} from "@/features/personalization/services/notification-services";
 
 export const NotificationsPopover = () => {
+	const { currentUser } = useAuth();
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [notifications, setNotifications] = useState<NotificationProp[]>([]);
 
@@ -25,20 +29,22 @@ export const NotificationsPopover = () => {
 	const { unread } = useNotifications();
 
 	const { data, isFetching } = useQuery({
-		queryKey: ["appbar-notifications"],
-		queryFn: async () => QUERIES.fetchNotifications(),
-		enabled: true,
+		queryKey: ["notification-popover-notifications"],
+		queryFn: async () => NOTIFICATION_CONTROLLER.FetchAllNotificationsWithUserId(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
+		refetchOnMount: true,
 		staleTime: 0,
 	});
 
 	useEffect(() => {
 		if (data && !isFetching) {
-			setNotifications(data);
+			const result = data.filter(n => !n.is_read);
+			setNotifications(result);
 		}
 	}, [data, isFetching]);
 
 	const markAllAsRead = () => {
-		setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
+		setNotifications(prev => prev.map(notif => ({ ...notif, is_read: true })));
 	};
 
 	const unreadCount = unread(notifications);
@@ -116,10 +122,18 @@ export const NotificationsPopover = () => {
 					</div>
 				</div>
 
-				<ScrollArea className="h-80">
-					<div className="space-y-1">
-						{renderNotifications}
-					</div>
+				<ScrollArea className="flex h-60">
+					{notifications && notifications.length > 0 ? (
+						<div className="space-y-1">
+							{renderNotifications}
+						</div>
+					) : (
+						<div className="mx-auto my-auto py-4 flex flex-col justify-center items-center h-60">
+							<h2 className="text-2xl font-semibold ">No Notifications</h2>
+							<p className="text-sm text-muted-foreground">Try checking again later</p>
+						</div>
+					)}
+
 				</ScrollArea>
 
 				<div className="p-3 border-t">
