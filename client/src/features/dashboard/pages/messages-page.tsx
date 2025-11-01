@@ -8,7 +8,9 @@ import { MessagesOverview } from "@/features/dashboard/components/messages/messa
 
 import type { ConversationProp } from "@/features/dashboard/types/message_types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { QUERIES as MESSAGE_QUERIES } from "@/features/dashboard/services/message-services";
+import {
+	CONTROLLER as MESSAGE_CONTROLLER
+} from "@/features/dashboard/services/message-services";
 import {
 	CONTROLLER as PROFILE_CONTROLLER
 } from "@/features/personalization/services/profile-services";
@@ -26,15 +28,15 @@ const MessagesContent = () => {
 	const { data: profileData, isLoading: profileLoading } = useQuery({
 		queryKey: ["messages-profile", currentUser?.id],
 		queryFn: () => PROFILE_CONTROLLER.FetchProfileWithUserId(currentUser?.id ?? 0),
-		refetchOnMount: !!currentUser?.id,
-		enabled: true,
+		enabled: !!currentUser?.id,
+		refetchOnMount: true,
 		staleTime: 0,
 	});
 
 	const { data: conversationData, isLoading: conversationsLoading } = useQuery({
-		queryKey: ["all-conversations"],
-		queryFn: () => MESSAGE_QUERIES.fetchConversationsByProfileId(1),
-		enabled: (query) => !query.state.data,
+		queryKey: ["messages-conversations", currentUser?.id],
+		queryFn: () => MESSAGE_CONTROLLER.FetchAllConversationWithProfileId(currentUser?.id ?? 0),
+		enabled: !!currentUser?.id,
 		refetchOnMount: true,
 		staleTime: 0,
 	});
