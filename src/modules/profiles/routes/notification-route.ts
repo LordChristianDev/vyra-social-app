@@ -74,7 +74,7 @@ router.get('/fetch-all', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some', async (ctx) => {
+router.post('/fetch-some', async (ctx) => {
 	const request_body = ctx.request.body as { page: number, pageSize: number };
 	const { page, pageSize } = request_body;
 
@@ -119,7 +119,7 @@ router.get('/fetch-all-with-user-id/:user_id', async (ctx) => {
 	};
 });
 
-router.get('/fetch-some-with-user-id/:user_id', async (ctx) => {
+router.post('/fetch-some-with-user-id/:user_id', async (ctx) => {
 	const user_id: SelectNotification["recipient_id"] = Number(ctx.params.user_id);
 
 	const request_body = ctx.request.body as { page: number, pageSize: number };
@@ -152,7 +152,7 @@ router.get('/fetch-some-with-user-id/:user_id', async (ctx) => {
  * Update
  */
 
-router.put('/update-notification/:id', async (ctx) => {
+router.put('/update/:id', async (ctx) => {
 	const id: SelectNotification["id"] = Number(ctx.params.id);
 
 	const [data, error] = await MUTATIONS.updateNotificationReadWithId(id);
@@ -179,7 +179,7 @@ router.put('/update-notification/:id', async (ctx) => {
  * Delete
  */
 
-router.delete('/delete-notification/:id', async (ctx) => {
+router.delete('/delete/:id', async (ctx) => {
 	const id: SelectNotification["id"] = Number(ctx.params.id);
 
 	const [data, error] = await MUTATIONS.deleteNotificationWithId(id);
