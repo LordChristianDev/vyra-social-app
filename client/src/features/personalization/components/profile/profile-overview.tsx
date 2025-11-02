@@ -6,6 +6,8 @@ import { DisplayPosts } from "@/features/dashboard/components/posts/display-post
 import { ProfileCard } from "@/features/personalization/components/profile/profile-card";
 import { ProfileCover } from "@/features/personalization/components/profile/profile-cover";
 import { ProfileInfo } from "@/features/personalization/components/profile/profile-info";
+import { ProfileMediaPosts } from "@/features/personalization/components/profile/profile-media-posts";
+import { ProfileSavedPosts } from "@/features/personalization/components/profile/profile-saved-posts";
 import { SuggestedProfiles } from "@/features/dashboard/components/additional/suggested-profiles";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
@@ -53,15 +55,11 @@ export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOvervie
 					</TabsContent>
 
 					<TabsContent value="media">
-						<div className="text-center py-12">
-							<p className="text-muted-foreground">No media posts yet</p>
-						</div>
+						<ProfileMediaPosts />
 					</TabsContent>
 
 					<TabsContent value="saved">
-						<div className="text-center py-12">
-							<p className="text-muted-foreground">No saved posts to show</p>
-						</div>
+						<ProfileSavedPosts />
 					</TabsContent>
 				</Tabs>
 			</div>

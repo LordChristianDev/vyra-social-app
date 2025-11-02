@@ -8,8 +8,12 @@ import { ProfileOverview } from "@/features/personalization/components/profile/p
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { CONTROLLER as POST_CONTROLLER } from "@/features/dashboard/services/post-services";
-import { CONTROLLER as PROFILE_CONTROLLER } from "@/features/personalization/services/profile-services";
+import {
+	CONTROLLER as POST_CONTROLLER
+} from "@/features/dashboard/services/post-services";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 export default function ProfilePage() {
 	return (
