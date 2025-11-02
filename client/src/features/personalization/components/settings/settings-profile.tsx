@@ -23,7 +23,9 @@ import {
 	UpdateProfileFormSchema, type UpdateProfileFormProp
 } from "@/features/personalization/types/settings-types";
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
-import { CONTROLLER } from "@/features/personalization/services/profile-services";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
 
 export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -72,7 +74,7 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 
 		setIsLoading(true);
 
-		const response = await CONTROLLER
+		const response = await PROFILE_CONTROLLER
 			.UpdateProfileWithUserId(
 				currentUser.id,
 				data,

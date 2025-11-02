@@ -3,7 +3,7 @@ import { retryOperation } from "@/lib/utils";
 import { tryCatch, type Result } from "@/lib/try-catch";
 
 import type { MediaProp, ProfileProp } from "@/features/personalization/types/profile-types";
-import type { UpdateProfileFormProp } from "@/features/personalization/types/settings-types";
+
 import {
 	QUERIES as SETTING_QUERIES,
 	MUTATIONS as SETTING_MUTATIONS
@@ -97,7 +97,7 @@ export const CONTROLLER = {
 	 * @param updates 
 	 * @returns boolean
 	 */
-	UpdateProfileWithUserId: async function (user_id: number, updates: UpdateProfileFormProp): Promise<boolean> {
+	UpdateProfileWithUserId: async function (user_id: number, updates: Object): Promise<boolean> {
 		if (!user_id) throw new Error("No Unique Identifier Found");
 
 		const cleanUpdates: Object = Object.fromEntries(

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Calendar, Edit3, Link2, MapPin, UserCheck, UserPlus } from "lucide-react";
 
+import { useProfile } from "@/context/use-profile";
 import { useRoutes } from "@/hooks/use-routes";
 import { cleanUrl, createFullName, formatIsoString } from "@/lib/formatters";
 
@@ -9,6 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 import type { ProfileProp } from "@/features/personalization/types/profile-types";
+import {
+	CONTROLLER as PROFILE_CONTROLLER
+} from "@/features/personalization/services/profile-services";
+import {
+	CONTROLLER as NOTIFICATION_CONTROLLER
+} from "@/features/personalization/services/notification-services";
 
 type ProfileCardProp = {
 	profile: ProfileProp;
@@ -16,13 +24,43 @@ type ProfileCardProp = {
 }
 
 export const ProfileCard = ({ profile, isOwnProfile }: ProfileCardProp) => {
+	const queryClient = useQueryClient();
 	const { move } = useRoutes();
+	const { profile: activeProfile } = useProfile();
 
-	const { created_at, first_name, last_name, username, bio, location, website_url, all_followers, privacy_settings: { is_verified } } = profile;
+	const { created_at, first_name, last_name, username, user_id, bio, location, website_url, all_followers, privacy_settings: { is_verified }, notif_settings: { notify_follows } } = profile;
 
-	const [followed, setFollowed] = useState<boolean>(all_followers.includes(1));
+	const [followed, setFollowed] = useState<boolean>(all_followers.includes(activeProfile.user_id));
 	const fullName = createFullName(first_name, last_name);
 
+	const handleFollow = async () => {
+		const status = !followed;
+		setFollowed(status);
+
+		const result = await PROFILE_CONTROLLER
+			.UpdateProfileWithUserId(
+				user_id,
+				{
+					all_followers: followed ? all_followers.filter(id => id !== activeProfile.user_id) : [...all_followers, activeProfile.user_id]
+				},
+			);
+
+		queryClient.invalidateQueries({ queryKey: ["view-profile-profile"] });
+		queryClient.invalidateQueries({ queryKey: ["suggested-profiles"] });
+
+		if (status && result && notify_follows) {
+			const result = await NOTIFICATION_CONTROLLER.CreateNewNotification(
+				activeProfile.user_id,
+				user_id,
+				`followed your post`,
+				"follow"
+			)
+
+			if (result) {
+				queryClient.invalidateQueries({ queryKey: ["notification-popover-notifications"] });
+			}
+		}
+	}
 
 	return (
 		<Card className="mb-6 shadow-soft">
@@ -41,7 +79,7 @@ export const ProfileCard = ({ profile, isOwnProfile }: ProfileCardProp) => {
 
 					<div className="flex gap-2">
 						{!isOwnProfile &&
-							<a onClick={() => setFollowed(!followed)}>
+							<a onClick={() => handleFollow()}>
 								<Button variant={followed ? 'check' : 'outline'} className="gap-2 cursor-pointer">
 									{followed ? < UserCheck className="h-4 w-4" /> : < UserPlus className="h-4 w-4" />}
 									{followed ? 'Following' : 'Follow'}
