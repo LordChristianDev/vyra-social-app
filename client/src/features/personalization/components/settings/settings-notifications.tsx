@@ -69,7 +69,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 				<div className="space-y-4">
 					{/* Notify Likes */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="likes">Likes</Label>
 							<p className="text-sm text-muted-foreground">Get notified when someone likes your posts</p>
 						</div>
@@ -83,7 +83,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 
 					{/* Notify Comments */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="comments">Comments</Label>
 							<p className="text-sm text-muted-foreground">Get notified when someone comments on your posts</p>
 						</div>
@@ -97,7 +97,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 
 					{/* Notify Follows */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="follows">New Followers</Label>
 							<p className="text-sm text-muted-foreground">Get notified when someone follows you</p>
 						</div>
@@ -112,7 +112,7 @@ export const SettingsNotifications = ({ notification }: { notification: Notifica
 
 					{/* Notify Messages */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="messages">Direct Messages</Label>
 							<p className="text-sm text-muted-foreground">Get notified for new direct messages</p>
 						</div>

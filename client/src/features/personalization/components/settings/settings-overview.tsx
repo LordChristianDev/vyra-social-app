@@ -19,17 +19,17 @@ export const SettingsOverview = ({ profile }: { profile: ProfileProp }) => {
 			<TabsList className="grid w-full grid-cols-3">
 				<TabsTrigger value="profile" className="gap-2 cursor-pointer">
 					<User className="h-4 w-4" />
-					Profile
+					<span className="hidden md:flex">Profile</span>
 				</TabsTrigger>
 
 				<TabsTrigger value="notifications" className="gap-2 cursor-pointer">
 					<Bell className="h-4 w-4" />
-					Notifications
+					<span className="hidden md:flex">Notifications</span>
 				</TabsTrigger>
 
 				<TabsTrigger value="privacy" className="gap-2 cursor-pointer">
 					<Shield className="h-4 w-4" />
-					Privacy
+					<span className="hidden md:flex">Privacy</span>
 				</TabsTrigger>
 			</TabsList>
 

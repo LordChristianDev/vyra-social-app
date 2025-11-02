@@ -106,7 +106,7 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 
 				<CardContent className="space-y-6">
 					{/* Profile Name */}
-					<div className="grid grid-cols-4 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<div className="space-y-2">
 							<Label htmlFor="first_name">First Name</Label>
 							<Input
@@ -165,7 +165,7 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 					</div>
 
 					{/* Username & Birth Date */}
-					<div className="grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div className="space-y-2">
 							<Label htmlFor="username">Username</Label>
 							<Input
@@ -203,7 +203,7 @@ export const SettingsProfile = ({ profile }: { profile: ProfileProp }) => {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div className="space-y-2">
 							<Label htmlFor="location">Location</Label>
 							<Input

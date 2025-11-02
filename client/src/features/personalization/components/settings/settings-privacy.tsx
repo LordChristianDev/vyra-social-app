@@ -66,7 +66,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 				<div className="space-y-4">
 					{/* Show Active Status */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="verification">Verification</Label>
 							<p className="text-sm text-muted-foreground">Show that you are verified</p>
 						</div>
@@ -80,7 +80,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 
 					{/* Make Profile Public */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="profileVisible">Public Profile</Label>
 							<p className="text-sm text-muted-foreground">Make your profile visible to everyone</p>
 						</div>
@@ -94,7 +94,7 @@ export const SettingsPrivacy = ({ privacy }: { privacy: PrivacySettingsProp }) =
 
 					{/* Show Active Status */}
 					<div className="flex items-center justify-between">
-						<div>
+						<div className="pr-4">
 							<Label htmlFor="activityStatus">Activity Status</Label>
 							<p className="text-sm text-muted-foreground">Show when you're online to others</p>
 						</div>
