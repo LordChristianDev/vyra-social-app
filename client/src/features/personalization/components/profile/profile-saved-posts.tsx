@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useAuth } from "@/context/use-auth";
-
 import { DisplayPosts } from "@/features/dashboard/components/posts/display-posts";
 
 import type { PostProp } from "@/features/dashboard/types/dashboard-types";
@@ -9,14 +7,13 @@ import {
 	CONTROLLER as POST_CONTROLLER
 } from "@/features/dashboard/services/post-services";
 
-export const ProfileSavedPosts = () => {
-	const { currentUser } = useAuth();
+export const ProfileSavedPosts = ({ user_id }: { user_id: number }) => {
 
 	const { data: postsData, isLoading: postsLoading } = useQuery({
-		queryKey: ["profile-saved-posts", currentUser?.id],
-		queryFn: () => POST_CONTROLLER.FetchAllSavedPostsWithAuthorId(currentUser?.id ?? 0),
-		enabled: !!currentUser?.id,
+		queryKey: ["profile-saved-posts", user_id],
+		queryFn: () => POST_CONTROLLER.FetchAllSavedPostsWithAuthorId(user_id),
 		refetchOnMount: true,
+		enabled: !!user_id,
 		staleTime: 0,
 	});
 

@@ -55,11 +55,11 @@ export const ProfileOverview = ({ profile, posts, isOwnProfile }: ProfileOvervie
 					</TabsContent>
 
 					<TabsContent value="media">
-						<ProfileMediaPosts />
+						<ProfileMediaPosts user_id={profile.user_id} />
 					</TabsContent>
 
 					<TabsContent value="saved">
-						<ProfileSavedPosts />
+						<ProfileSavedPosts user_id={profile.user_id} />
 					</TabsContent>
 				</Tabs>
 			</div>
