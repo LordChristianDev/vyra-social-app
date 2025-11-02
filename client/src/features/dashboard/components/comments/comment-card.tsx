@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 
 import { useAuth } from "@/context/use-auth";
 import { cn } from "@/lib/utils";
@@ -19,7 +21,6 @@ import type { CommentProp } from "@/features/dashboard/types/dashboard-types";
 import {
 	CONTROLLER as COMMENT_CONTROLLER
 } from "@/features/dashboard/services/comment-services";
-import { MoreHorizontal, Trash2 } from "lucide-react";
 
 export const CommentCard = ({ comment }: { comment: CommentProp }) => {
 	const queryClient = useQueryClient();
@@ -72,10 +73,12 @@ export const CommentCard = ({ comment }: { comment: CommentProp }) => {
 
 	return (
 		<div className="flex gap-3">
-			<AvatarIcon
-				src={avatar_url ?? ""}
-				fallback={getInitials(fullName)}
-			/>
+			<Link to={`/view-profile/${author_id}`}>
+				<AvatarIcon
+					src={avatar_url ?? ""}
+					fallback={getInitials(fullName)}
+				/>
+			</Link>
 
 			<div className="flex-1">
 				<div className="flex items-center justify-between">

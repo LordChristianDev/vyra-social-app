@@ -1,4 +1,5 @@
 import { UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@/context/use-auth";
@@ -30,7 +31,7 @@ export const SuggestedProfiles = () => {
 	});
 
 	const renderProfiles = (profilesData ?? []).map((profile) => {
-		const { id, first_name, last_name, avatar_url, username, all_followers } = profile as ProfileProp;
+		const { id, first_name, last_name, avatar_url, username, user_id, all_followers } = profile as ProfileProp;
 
 		const fullName = createFullName(first_name, last_name);
 
@@ -48,7 +49,10 @@ export const SuggestedProfiles = () => {
 						<p className="text-sm text-muted-foreground">{all_followers.length} followers</p>
 					</div>
 				</div>
-				<Button size="default" variant="outline" className="shrink-0 cursor-pointer">Follow</Button>
+
+				<Link to={`/view-profile/${user_id}`}>
+					<Button size="default" variant="outline" className="shrink-0 cursor-pointer">Follow</Button>
+				</Link>
 			</div>
 		);
 	})

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from 'react-router-dom';
 import { useQueryClient } from "@tanstack/react-query";
 import { Bookmark, Edit, Heart, MessageCircle, MoreHorizontal, Share, Trash2 } from "lucide-react";
 
@@ -169,11 +170,13 @@ export const PostCard = ({ post }: { post: PostProp }) => {
 			<CardHeader className="pb-3">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
-						<AvatarIcon
-							src={avatar_url ?? ""}
-							fallback={getInitials(fullName)}
-							size="md"
-						/>
+						<Link to={`/view-profile/${author_id}`}>
+							<AvatarIcon
+								src={avatar_url ?? ""}
+								fallback={getInitials(fullName)}
+								size="md"
+							/>
+						</Link>
 
 						<div>
 							<div className="flex items-center gap-2">

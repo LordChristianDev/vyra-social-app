@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, MoreVertical, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { createFullName, getInitials, timeAgo } from "@/lib/formatters";
@@ -217,12 +218,14 @@ export const ActiveChat = ({ profile, activeConversation, conversationId }: Acti
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
 						<div className="relative">
-							<AvatarIcon
-								src={otherParticipant.profile.avatar_url ?? ""}
-								fallback={getInitials(createFullName(otherParticipant.profile.first_name, otherParticipant.profile.last_name))}
-								className="ring-2 ring-primary/20"
-								size="lg"
-							/>
+							<Link to={`/view-profile/${otherParticipant.profile.user_id}`}>
+								<AvatarIcon
+									src={otherParticipant.profile.avatar_url ?? ""}
+									fallback={getInitials(createFullName(otherParticipant.profile.first_name, otherParticipant.profile.last_name))}
+									className="ring-2 ring-primary/20"
+									size="lg"
+								/>
+							</Link>
 						</div>
 
 						<div>
@@ -232,7 +235,7 @@ export const ActiveChat = ({ profile, activeConversation, conversationId }: Acti
 
 					<div className="flex items-center gap-2">
 						<Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-smooth">
-							<MoreVertical className="h-5 w-5" />
+							{/* <MoreVertical className="h-5 w-5" /> */}
 						</Button>
 					</div>
 				</div>
