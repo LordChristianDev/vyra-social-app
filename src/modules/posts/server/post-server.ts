@@ -1,4 +1,4 @@
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, isNotNull, arrayContains } from "drizzle-orm";
 
 import { db } from "@config/db";
 import { queryDB } from "@/utils/try-catch";
@@ -63,6 +63,79 @@ export const QUERIES = {
 				.orderBy(desc(POSTS_TABLE.created_at))
 				.limit(pageSize)
 				.offset((page - 1) * pageSize);
+
+			return result;
+		});
+	},
+	fetchAllPostsWithAuthorIdAndMedia: async function (author_id: SelectPost["author_id"]) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(POSTS_TABLE)
+				.where(
+					and(
+						eq(POSTS_TABLE.author_id, author_id),
+						isNotNull(POSTS_TABLE.images),
+						sql`array_length(${POSTS_TABLE.images}, 1) > 0`
+					)
+				)
+				.orderBy(desc(POSTS_TABLE.created_at));
+
+			return result;
+		});
+	},
+	fetchSomePostsWithAuthorIdAndMedia: async function (
+		author_id: SelectPost["author_id"],
+		page: number = 1,
+		pageSize: number = 5,
+	) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(POSTS_TABLE)
+				.where(
+					and(
+						eq(POSTS_TABLE.author_id, author_id),
+						isNotNull(POSTS_TABLE.images),
+						sql`array_length(${POSTS_TABLE.images}, 1) > 0`
+					)
+				)
+				.orderBy(desc(POSTS_TABLE.created_at))
+				.limit(pageSize)
+				.offset((page - 1) * pageSize);
+
+			return result;
+		});
+	},
+	fetchAllSavedPostsWithUserId: async function (user_id: SelectPost["author_id"]) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(POSTS_TABLE)
+				.where(
+					arrayContains(POSTS_TABLE.all_saved, [user_id])
+				)
+				.orderBy(desc(POSTS_TABLE.created_at));
+
+			return result;
+		});
+	},
+	fetchSomeSavedPostsWithUserId: async function (
+		user_id: SelectPost["author_id"],
+		page: number = 1,
+		pageSize: number = 5,
+	) {
+		return queryDB(async () => {
+			const result = await db
+				.select()
+				.from(POSTS_TABLE)
+				.where(
+					arrayContains(POSTS_TABLE.all_saved, [user_id])
+				)
+				.orderBy(desc(POSTS_TABLE.created_at))
+				.limit(pageSize)
+				.offset((page - 1) * pageSize);
+
 
 			return result;
 		});

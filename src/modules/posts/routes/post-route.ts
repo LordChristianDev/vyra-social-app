@@ -153,6 +153,107 @@ router.post('/fetch-some-with-author-id/:author_id', async (ctx) => {
 	};
 });
 
+router.get('/fetch-all-media-posts-author-id/:author_id', async (ctx) => {
+	const author_id: SelectPost["author_id"] = Number(ctx.params.author_id);
+
+	const [data, error] = await QUERIES.fetchAllPostsWithAuthorIdAndMedia(author_id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch all posts',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.post('/fetch-some-media-posts-author-id/:author_id', async (ctx) => {
+	const author_id: SelectPost["author_id"] = Number(ctx.params.author_id);
+	const request_body = ctx.request.body as { page: number, pageSize: number };
+	const { page, pageSize } = request_body;
+
+	const [data, error] = await QUERIES.fetchSomePostsWithAuthorIdAndMedia(
+		author_id,
+		page,
+		pageSize,
+	);
+
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch some posts',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.get('/fetch-all-saved-posts-author-id/:author_id', async (ctx) => {
+	const author_id: SelectPost["author_id"] = Number(ctx.params.author_id);
+
+	const [data, error] = await QUERIES.fetchAllSavedPostsWithUserId(author_id);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch all posts',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
+router.post('/fetch-some-saved-posts-author-id/:author_id', async (ctx) => {
+	const author_id: SelectPost["author_id"] = Number(ctx.params.author_id);
+	const request_body = ctx.request.body as { page: number, pageSize: number };
+	const { page, pageSize } = request_body;
+
+	const [data, error] = await QUERIES.fetchSomeSavedPostsWithUserId(
+		author_id,
+		page,
+		pageSize,
+	);
+
+	if (error) {
+		ctx.status = 500;
+		ctx.body = {
+			status: false,
+			error: 'Failed to fetch some posts',
+			message: error.message,
+		};
+		return;
+	}
+
+	ctx.status = 200;
+	ctx.body = {
+		status: true,
+		data,
+	};
+});
+
 router.get('/fetch-tags', async (ctx) => {
 	const [data, error] = await QUERIES.fetchTags();
 
