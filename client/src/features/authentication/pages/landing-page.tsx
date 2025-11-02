@@ -47,7 +47,7 @@ export default function LandingPage() {
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Hero Section */}
-			<section className="relative overflow-hidden">
+			<section className="mx-4 relative overflow-hidden">
 				<Navbar />
 
 				<HeroSection />

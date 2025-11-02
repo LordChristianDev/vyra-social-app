@@ -40,10 +40,10 @@ export const FeaturesSection = () => {
 						Explore and Engage
 					</Badge>
 
-					<h2 className="text-4xl lg:text-5xl text-gray-900 font-bold leading-snug">
+					<h2 className="text-3xl lg:text-5xl text-gray-900 font-bold leading-snug">
 						Everything you need for
 						<br />
-						<span className="bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent animate-gradient bg-[length:100%_auto]">
+						<span className="bg-linear-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent animate-gradient bg-size-[100%_auto]">
 							meaningful connections
 						</span>
 					</h2>

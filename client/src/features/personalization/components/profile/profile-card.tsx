@@ -52,7 +52,7 @@ export const ProfileCard = ({ profile, isOwnProfile }: ProfileCardProp) => {
 						{isOwnProfile &&
 							<Button
 								onClick={() => move('/settings')}
-								className="bg-gradient-primary text-white gap-2 cursor-pointer"
+								className="hidden md:flex bg-gradient-primary text-white gap-2 cursor-pointer"
 							>
 								<Edit3 className="h-4 w-4" />
 								Edit Profile

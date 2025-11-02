@@ -8,7 +8,7 @@ import { LoginDialog } from "@/features/authentication/components/login/login-di
 
 export const HeroSection = () => {
 	return (
-		<div className="container mx-auto pt-8 relative max-w-7xl">
+		<div className="container mx-auto px-4 pt-8 relative max-w-7xl">
 			<div className="flex flex-wrap gap-12 items-center animate-fade-in">
 				<div className="flex-1 space-y-8 ">
 					<div className="space-y-4">
@@ -21,7 +21,7 @@ export const HeroSection = () => {
 
 						<h1 className="mb-6 text-4xl md:text-6xl font-bold text-gray-900">
 							Connect with your {" "}
-							<span className="bg-gradient-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent animate-gradient bg-[length:100%_auto]">
+							<span className="bg-linear-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent animate-gradient bg-size-[100%_auto]">
 								community
 							</span>
 						</h1>
@@ -50,7 +50,7 @@ export const HeroSection = () => {
 							asChild
 							size="lg"
 							className={cn(
-								"border text-gray-900 bg-[oklch(0.99_0.01_285)] shadow-xs hover:bg-[oklch(0.96_0.05_295)] hover:text-[oklch(0.72_0.18_285)]",
+								"mb-4 border text-gray-900 bg-[oklch(0.99_0.01_285)] shadow-xs hover:bg-[oklch(0.96_0.05_295)] hover:text-[oklch(0.72_0.18_285)]",
 								"border-primary/20 hover:bg-primary/5 transition-smooth"
 							)}
 						>
@@ -67,7 +67,7 @@ export const HeroSection = () => {
 					</div>
 				</div>
 
-				<div className="relative flex-1">
+				<div className="hidden md:flex flex-1">
 					<img
 						src="/images/social_media_guy.png"
 						alt="Vyra Platform Preview"
