@@ -232,6 +232,174 @@ export const CONTROLLER = {
 		return result;
 	},
 	/**
+	 * Fetches all media posts with the given author ID
+	 * @param author_id 
+	 * @returns PostProp[]
+	 */
+	FetchAllMediaPostsWithAuthorId: async function (author_id: number): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchAllMediaPostsWithAuthorId(author_id);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches some media posts with the given author ID
+	 * @param author_id 
+	 * @param page 
+	 * @param pageSize 
+	 * @returns PostProp[]
+	 */
+	FetchSomeMediaPostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number
+	): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchSomeMediaPostsWithAuthorId(author_id, page, pageSize);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches all saved posts with the given author ID
+	 * @param author_id 
+	 * @returns PostProp[]
+	 */
+	FetchAllSavedPostsWithAuthorId: async function (author_id: number): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchAllSavedPostsWithAuthorId(author_id);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
+	 * Fetches some saved posts with the given author ID
+	 * @param author_id 
+	 * @param page 
+	 * @param pageSize 
+	 * @returns PostProp[]
+	 */
+	FetchSomeSavedPostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number
+	): Promise<PostProp[]> {
+		const [posts, error] = await QUERIES.fetchSomeSavedPostsWithAuthorId(author_id, page, pageSize);
+
+		if (error) throw new Error('Error fetching posts:', error);
+		if (!posts) return [];
+
+		const result: PostProp[] = await Promise.all(
+			posts.map(async (post) => {
+				const { id, author_id } = post;
+				let setPost: PostProp = post;
+
+				const profile = await PROFILE_CONTROLLER.FetchProfileWithUserId(author_id);
+				if (profile) setPost = { ...setPost, author: profile };
+
+				const comments = await COMMENT_CONTROLLER.FetchAllCommentsWithPostId(id);
+				if (comments) setPost = { ...setPost, comments };
+
+				if (post.all_tags && post.all_tags.length > 0) {
+					const tags: TagProp[] = (await Promise.all(
+						post.all_tags.map(async (tag_id) => {
+							const tag = await CONTROLLER.FetchTagWithId(tag_id);
+							return tag;
+						})
+					)).filter((tag): tag is TagProp => tag !== undefined);
+
+					if (tags.length > 0) setPost = { ...setPost, tags };
+				}
+
+				return setPost;
+			})
+		);
+
+		return result;
+	},
+	/**
 	 * Fetches all tags
 	 * @returns TagProp[]
 	 */
@@ -456,6 +624,122 @@ export const QUERIES = {
 		return tryCatch(
 			(async () => {
 				const response = await fetch(BASE_URL + `/post/fetch-some-with-author-id/${author_id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						page,
+						pageSize,
+					}),
+				});
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchAllMediaPostsWithAuthorId: async function (author_id: number): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-all-media-posts-author-id/${author_id}`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchSomeMediaPostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number,
+	): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-some-media-posts-author-id/${author_id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						page,
+						pageSize,
+					}),
+				});
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchAllSavedPostsWithAuthorId: async function (author_id: number): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-all-saved-posts-author-id/${author_id}`, {
+					method: "GET",
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.error || "Something went wrong!");
+				}
+
+				// Failed to Fetch Posts
+				if (data.status === false) throw new Error(data.error || "Something went wrong!");
+
+				let result: PostProp[] = [];
+
+				if (data.status === true && data.data) result = data.data;
+
+				return result;
+			})()
+		);
+	},
+	fetchSomeSavedPostsWithAuthorId: async function (
+		author_id: number,
+		page: number,
+		pageSize: number,
+	): Promise<Result<PostProp[]>> {
+		return tryCatch(
+			(async () => {
+				const response = await fetch(BASE_URL + `/post/fetch-some-saved-posts-author-id/${author_id}`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
