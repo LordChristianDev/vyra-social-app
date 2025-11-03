@@ -22,8 +22,6 @@ router.post('/create', async (ctx) => {
 
 	const [data, error] = await MUTATIONS.createUser(uid);
 
-	console.log("Server data:", data);
-
 	if (error) {
 		ctx.status = 500;
 		ctx.body = {

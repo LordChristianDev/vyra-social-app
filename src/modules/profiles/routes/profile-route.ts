@@ -222,8 +222,6 @@ router.put('/update-profile-user-id/:user_id', async (ctx) => {
 	const request_body = ctx.request.body as { updates: object };
 	const { updates } = request_body;
 
-	console.log("This is request body", request_body);
-
 	const [data, error] = await MUTATIONS.updateProfileWithUserId(
 		user_id,
 		updates,

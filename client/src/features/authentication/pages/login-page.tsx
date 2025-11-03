@@ -57,7 +57,6 @@ const LoginContent = () => {
 
 		// User exists in database
 		if (data) {
-			console.log("User found, storing data", data);
 			storeUser(data);
 			return;
 		}

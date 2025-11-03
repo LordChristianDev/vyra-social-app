@@ -57,7 +57,7 @@ app.use(apiRouter.allowedMethods());
 
 // Serve static React files
 const clientPath = path.join(__dirname, '../../client/dist');
-console.log('👉 Serving client from:', clientPath);
+// console.log('👉 Serving client from:', clientPath);
 
 app.use(serve(clientPath));
 
@@ -94,7 +94,7 @@ const PORT = process.env.PORT || 4000;
 
 // CHANGE THIS: Use server.listen() instead of app.listen()
 server.listen(PORT, () => {
-  console.log(`👉 Server running on http://localhost:${PORT}`);
-  console.log(`👉 API available at http://localhost:${PORT}/api`);
-  console.log(`📡 WebSocket server running on ws://localhost:${PORT}`);
+  // console.log(`👉 Server running on http://localhost:${PORT}`);
+  // console.log(`👉 API available at http://localhost:${PORT}/api`);
+  // console.log(`📡 WebSocket server running on ws://localhost:${PORT}`);
 });

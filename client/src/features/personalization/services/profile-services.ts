@@ -417,7 +417,6 @@ export const MUTATIONS = {
 	): Promise<Result<boolean>> => {
 		return tryCatch(
 			(async () => {
-				console.log(updates)
 				const response = await fetch(BASE_URL + `/profile/update-profile-user-id/${user_id}`, {
 					method: "PUT",
 					headers: {
@@ -428,7 +427,6 @@ export const MUTATIONS = {
 					}),
 				});
 				const data = await response.json();
-				console.log(data)
 
 				if (!response.ok) {
 					throw new Error(data.error || "Something went wrong!");

@@ -61,14 +61,9 @@ export const usePostHandler = () => {
 
 		setIsPosting(true);
 		try {
-			// TODO: Implement post submission logic
-			console.log('Submitting post:', { postContent, postImages });
-			// Reset form after successful submission
 			setPostContent('');
 			setPostImages([]);
 			setIsCreatePostDialogOpen(false);
-		} catch (error) {
-			console.error('Error submitting post:', error);
 		} finally {
 			setIsPosting(false);
 		}

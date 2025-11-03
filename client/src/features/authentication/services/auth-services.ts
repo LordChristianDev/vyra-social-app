@@ -37,8 +37,6 @@ export const CONTROLLER = {
 	FetchUserWithUid: async function (uid: string): Promise<UserProp | null> {
 		if (!uid) throw new Error("No Unique Identifier Found");
 
-		console.log("This is the base url", BASE_URL, uid)
-
 		const [data, error] = await QUERIES.fetchUserWithUid(uid);
 
 		if (error) throw new Error('Error fetching user:', error);
@@ -97,15 +95,10 @@ export const QUERIES = {
 	fetchUserWithUid: async function (uid: string): Promise<Result<UserProp | null>> {
 		return tryCatch(
 			(async () => {
-
-				console.log("This is the base url", BASE_URL, uid)
-
 				const response = await fetch(BASE_URL + `/auth/fetch-uid/${uid}`, {
 					method: "GET"
 				});
 				const data = await response.json();
-
-				console.log("This is after response", response)
 
 				// Check if response is ok
 				if (!response.ok) {

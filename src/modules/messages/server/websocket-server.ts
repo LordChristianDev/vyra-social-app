@@ -14,7 +14,7 @@ class WebSocketServer {
 		this.wss = new WebSocket.Server({ server });
 
 		this.wss.on('connection', (ws: WebSocketClient, req) => {
-			console.log('New WebSocket connection');
+			// console.log('New WebSocket connection');
 
 			ws.on('message', (message: string) => {
 				try {
@@ -30,7 +30,7 @@ class WebSocketServer {
 						}
 						this.clients.get(data.conversation_id)?.add(ws);
 
-						console.log(`Client subscribed to conversation ${data.conversation_id}`);
+						// console.log(`Client subscribed to conversation ${data.conversation_id}`);
 					}
 				} catch (error) {
 					console.error('Error parsing message:', error);
@@ -48,7 +48,7 @@ class WebSocketServer {
 						}
 					}
 				}
-				console.log('Client disconnected');
+				//console.log('Client disconnected');
 			});
 
 			ws.on('error', (error) => {
